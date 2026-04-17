@@ -32,9 +32,14 @@ def fetch_metadata(submissions: dict[str, dict[str, list[int]]]) -> None:
     }
     """
 
-    for quest_id, details in submissions.items():
-        
-        title_slug = details.get("title_slug")
+    updated_data = {}
+
+    for quest_id, sub_list in submissions.items():
+        if not sub_list:
+            continue
+            
+        title_slug = sub_list[0]["title_slug"]
+        title = sub_list[0]["title"]
         
         # Build the GraphQL payload
         payload = {
@@ -46,28 +51,45 @@ def fetch_metadata(submissions: dict[str, dict[str, list[int]]]) -> None:
         
         if response.status_code == 200:
             data = response.json()
-            question_data = data.get("data", {}).get("question", {})
+            question_data = data.get("data", {}).get("question", {}) or {}
             
             # Extract difficulty and format tags into a clean list of strings
             difficulty = question_data.get("difficulty", "Unknown")
             raw_tags = question_data.get("topicTags", [])
-            tags = [tag.get("name") for tag in raw_tags]
+            tags = [tag.get("name") for tag in raw_tags if tag]
             
-            # Update our dictionary
-            details["difficulty"] = difficulty
-            details["tags"] = tags
+            # Clean up individual submissions (remove title/title_slug as they are now metadata)
+            clean_subs = []
+            for sub in sub_list:
+                clean_subs.append({
+                    "lang": sub.get("lang"),
+                    "runtime": sub.get("runtime"),
+                    "memory": sub.get("memory"),
+                    "code": sub.get("code"),
+                    "timestamp": sub.get("timestamp")
+                })
             
+            # Update our dictionary with the new structure
+            updated_data[quest_id] = {
+                "title": title,
+                "title_slug": title_slug,
+                "difficulty": difficulty,
+                "tags": tags,
+                "submissions": clean_subs
+            }
+            
+            print(f"✅ Fetched metadata for {title_slug}")
             time.sleep(2)  # Polite delay to avoid GraphQL rate limits
         else:
             print(f"Error fetching {title_slug}: {response.status_code}")
             break
 
     with open("data/submissions_updated.json", "w") as f:
-        json.dump(submissions, f, indent=4)
+        json.dump(updated_data, f, indent=4)
 
 
 def main() -> None:
-    data_path = "data/submissions.json"
+    data_path = "data/submissions_cache.json"
     
     with open(data_path, "r") as f:
         submissions = json.load(f)
