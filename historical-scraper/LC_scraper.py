@@ -26,8 +26,36 @@ session.headers.update({
 })
 
 
+def fetch_latest_timestamp() -> int:
+    """Fetches the global maximum timestamp from the submissions cache to use as a watermark."""
+    try:
+        data_path = os.path.join(os.path.dirname(__file__), "data", "submissions_cache.json")
+        with open(data_path, "r") as f:
+            submissions = json.load(f)
+            
+        max_ts = 0
+        for q_id, subs in submissions.items():
+            if not subs:
+                continue
+            # The last element is the newest attempt for this question
+            last_ts = subs[-1].get("timestamp", 0)
+            if last_ts > max_ts:
+                max_ts = last_ts
+                
+        return max_ts
+        
+    except FileNotFoundError:
+        # If cache doesn't exist, we return 0 so it fetches everything
+        return 0
+
+
 def fetch_user_submissions() -> dict[int, list[dict]]:
-    return {}
+    latest_synced_timestamp = fetch_latest_timestamp()
+    if latest_synced_timestamp > 0:
+        print(f"Watermark found: {latest_synced_timestamp}. Will only fetch newer submissions.")
+    else:
+        print("No watermark found. Fetching all historical submissions...")
+
     offset = 0
     limit = 20
     has_next = True
@@ -51,6 +79,14 @@ def fetch_user_submissions() -> dict[int, list[dict]]:
                 break
 
             for submission in submissions:
+                sub_timestamp = submission.get("timestamp", 0)
+                
+                # Check if we've reached submissions we already synced
+                if sub_timestamp <= latest_synced_timestamp:
+                    print("Reached previously synced submissions. Stopping pagination.")
+                    has_next = False
+                    break
+
                 question_id = submission.get("question_id")
                 status = submission.get("status_display")
                 
@@ -63,15 +99,14 @@ def fetch_user_submissions() -> dict[int, list[dict]]:
                         "runtime": submission.get("runtime"),
                         "memory": submission.get("memory"),
                         "code": submission.get("code"),
-                        "timestamp": submission.get("timestamp")
+                        "timestamp": sub_timestamp
                     })
             
             offset += limit
             time.sleep(5)  # Delay to prevent rate-limiting
             
         else:
-            print(f"Error {response.status_code}: {response.text}")
-            break
+            raise Exception(f"Failed to fetch from LeetCode. Status {response.status_code}: {response.text}")
 
     return accepted_submissions
 
