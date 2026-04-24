@@ -16,6 +16,7 @@ session.headers.update({
     "Content-Type": "application/json"
 })
 
+
 def fetch_metadata(submissions: dict[str, dict[str, list[int]]]) -> None:
     """Fetch all submissions for a user"""
     
@@ -33,6 +34,12 @@ def fetch_metadata(submissions: dict[str, dict[str, list[int]]]) -> None:
     """
 
     updated_data = {}
+    updated_data_path = "data/submissions_updated.json"
+
+    # Load existing updated_data so we don't have to re-fetch metadata we already know
+    if os.path.exists(updated_data_path):
+        with open(updated_data_path, "r") as f:
+            updated_data = json.load(f)
 
     for quest_id, sub_list in submissions.items():
         if not sub_list:
@@ -40,6 +47,25 @@ def fetch_metadata(submissions: dict[str, dict[str, list[int]]]) -> None:
             
         title_slug = sub_list[0]["title_slug"]
         title = sub_list[0]["title"]
+
+        # Clean up individual submissions
+        clean_subs = []
+        for sub in sub_list:
+            clean_subs.append({
+                "lang": sub.get("lang"),
+                "runtime": sub.get("runtime"),
+                "memory": sub.get("memory"),
+                "code": sub.get("code"),
+                "timestamp": sub.get("timestamp")
+            })
+
+        # Check if we already have the metadata cached
+        if quest_id in updated_data:
+            # We already know the difficulty and tags! 
+            # We just need to update the submissions list with the newest cache
+            updated_data[quest_id]["submissions"] = clean_subs
+            print(f"Skipped API for {title_slug} (Loaded from cache)")
+            continue
         
         # Build the GraphQL payload
         payload = {
@@ -53,21 +79,9 @@ def fetch_metadata(submissions: dict[str, dict[str, list[int]]]) -> None:
             data = response.json()
             question_data = data.get("data", {}).get("question", {}) or {}
             
-            # Extract difficulty and format tags into a clean list of strings
             difficulty = question_data.get("difficulty", "Unknown")
             raw_tags = question_data.get("topicTags", [])
             tags = [tag.get("name") for tag in raw_tags if tag]
-            
-            # Clean up individual submissions (remove title/title_slug as they are now metadata)
-            clean_subs = []
-            for sub in sub_list:
-                clean_subs.append({
-                    "lang": sub.get("lang"),
-                    "runtime": sub.get("runtime"),
-                    "memory": sub.get("memory"),
-                    "code": sub.get("code"),
-                    "timestamp": sub.get("timestamp")
-                })
             
             # Update our dictionary with the new structure
             updated_data[quest_id] = {
@@ -84,9 +98,9 @@ def fetch_metadata(submissions: dict[str, dict[str, list[int]]]) -> None:
             print(f"Error fetching {title_slug}: {response.status_code}")
             break
 
-    with open("data/submissions_updated.json", "w") as f:
+    with open(updated_data_path, "w") as f:
         json.dump(updated_data, f, indent=4)
-
+    
 
 def main() -> None:
     data_path = "data/submissions_cache.json"
