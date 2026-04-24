@@ -23,8 +23,13 @@ LANG_MAP = {
     "csharp": ".cs"
 }
 
-def create_remote_repo(repo_name):
-    """Uses the GitHub REST API to create a new private repository."""
+# Helper function to run terminal commands safely in the repo directory
+def run_git(args: list[str], root_dir: Path) -> None:
+    subprocess.run(["git"] + args, cwd=root_dir, check=False, capture_output=True)
+
+
+def create_remote_repo(repo_name: str) -> tuple[str, bool]:
+    """Uses the GitHub REST API to create a new private repository if it doesn't already exist."""
 
     print(f"Checking remote GitHub repository '{repo_name}'...")
 
@@ -43,22 +48,44 @@ def create_remote_repo(repo_name):
     }
     
     response = requests.post(url, headers=headers, json=payload)
+
+    print(response.text)
     
     if response.status_code == 201:
         print("Successfully created remote repository on GitHub!")
-        return response.json().get("clone_url")
+        return (response.json().get("clone_url"), True)
     elif response.status_code == 422: # 422 means it already exists
         print("Remote repository already exists. We will push to it.")
-        return f"https://github.com/{GITHUB_USER}/{repo_name}.git"
+        return (f"https://github.com/{GITHUB_USER}/{repo_name}.git", False)
     else:
         print(f"Failed to create remote repo. Status: {response.status_code}")
         print(response.json())
         exit(1)
 
 
-def build_and_push(repo_name):
-    print("Loading submissions...")
+def sync_repository(repo_name: str, remote_url: str, is_new_remote: bool) -> None:
+    root_dir = Path(f"./{repo_name}")
+    auth_remote_url = remote_url.replace("https://", f"https://{GITHUB_USER}:{GITHUB_TOKEN}@")
     
+    # 1. Local Git Initialization / Synchronization
+    if is_new_remote:
+        print("New remote repository detected. Initializing local folder...")
+        root_dir.mkdir(exist_ok=True)
+        run_git(["init"], root_dir)
+        run_git(["branch", "-M", "main"], root_dir)
+        run_git(["remote", "add", "origin", auth_remote_url], root_dir)
+    else:
+        print("Existing remote repository detected.")
+        if not root_dir.exists() or not (root_dir / ".git").exists():
+            print("Local repository missing. Cloning from GitHub...")
+            subprocess.run(["git", "clone", auth_remote_url, str(root_dir)], check=True)
+        else:
+            print("Local repository found. Pulling latest changes...")
+            run_git(["remote", "set-url", "origin", auth_remote_url], root_dir)
+            run_git(["pull", "origin", "main"], root_dir)
+            
+    # 2. Build local files (overwriting existing ones)
+    print("Loading submissions and generating local files...")
     try:
         data_path = os.path.join(os.path.dirname(__file__), "data", "submissions_updated.json")
         with open(data_path, "r") as f:
@@ -66,39 +93,28 @@ def build_and_push(repo_name):
     except FileNotFoundError:
         print("data/submissions_updated.json not found!")
         return
-
-    # 1. Create the Local File Structure
-    root_dir = Path(f"./{repo_name}")
-    root_dir.mkdir(exist_ok=True)
-    
-    print("Generating local files...")
+        
     for question_id, data in cache.items():
         difficulty = data.get("difficulty", "Unknown")
-        
         subs = data.get("submissions", [])
         if not subs:
             continue
             
-        # We'll use the language of the latest submission to determine the file extension
         latest_sub = subs[-1]
         primary_lang = latest_sub.get("lang", "python3")
         extension = LANG_MAP.get(primary_lang, ".txt")
         
-        # Create directory path: e.g., algorithm-submissions/Easy/
         problem_dir = root_dir / difficulty
         problem_dir.mkdir(parents=True, exist_ok=True)
         
-        # Format filename: e.g., 0001-two-sum.py
         padded_id = str(question_id).zfill(4)
         file_name = f"{padded_id}-{data.get('title_slug')}{extension}"
         file_path = problem_dir / file_name
         
         tags_str = ", ".join(data.get("tags", []))
-        
         c_start = "/*\n" if extension in [".java", ".cpp", ".js", ".ts", ".c", ".cs"] else '"""\n'
         c_end   = "*/\n" if extension in [".java", ".cpp", ".js", ".ts", ".c", ".cs"] else '"""\n'
         
-        # Build the top-level metadata
         file_content = [
             f"{c_start}",
             f"Problem Name: {data.get('title')}\n",
@@ -107,7 +123,6 @@ def build_and_push(repo_name):
             f"{c_end}\n"
         ]
         
-        # Append every submission to the file
         for i, sub in enumerate(subs):
             sub_lang = sub.get("lang", "python3")
             runtime = sub.get("runtime", "N/A")
@@ -121,35 +136,21 @@ def build_and_push(repo_name):
             file_content.append(f"{c_end}")
             file_content.append(sub.get("code", "") + "\n\n")
             
-        # Write the file
         with open(file_path, "w", encoding="utf-8") as f:
             f.write("".join(file_content))
-
-    print(f"Generated {len(cache)} files locally.")
-
-    # 2. Create the Remote Repository
-    remote_url = create_remote_repo(repo_name)
+            
+    print(f"Generated/Updated files locally.")
     
-    # 3. Local Git Orchestration & Push
-    print("Executing Git commands...")
+    # 3. Check for changes and push
+    status_result = subprocess.run(["git", "status", "--porcelain"], cwd=root_dir, capture_output=True, text=True)
+    if not status_result.stdout.strip():
+        print("Everything is up to date! No new changes to push.")
+        return
+        
+    print("Changes detected. Committing and pushing to GitHub...")
+    run_git(["add", "."], root_dir)
+    run_git(["commit", "-m", "Auto-sync new LeetCode submissions"], root_dir)
     
-    # Helper function to run terminal commands safely in the repo directory
-    def run_git(args):
-        subprocess.run(["git"] + args, cwd=root_dir, check=False, capture_output=True)
-
-    run_git(["init"])
-    run_git(["branch", "-M", "main"])
-    run_git(["add", "."])
-    run_git(["commit", "-m", "Initial bulk sync of historical submissions"])
-    
-    # Remove origin if it exists to avoid errors, then add the fresh one
-    run_git(["remote", "remove", "origin"]) 
-    
-    # Inject the PAT directly into the URL for a passwordless push
-    auth_remote_url = remote_url.replace("https://", f"https://{GITHUB_USER}:{GITHUB_TOKEN}@")
-    run_git(["remote", "add", "origin", auth_remote_url])
-    
-    print("Pushing to GitHub (this may take a few seconds)...")
     push_result = subprocess.run(["git", "push", "-u", "origin", "main"], cwd=root_dir, capture_output=True, text=True)
     
     if push_result.returncode == 0:
@@ -162,9 +163,9 @@ def main():
     args = argparse.ArgumentParser()
     args.add_argument("--repo", type=str, required=True, help="Name of the remote repository")
     args = args.parse_args()
-    
-    build_and_push(args.repo)
 
+    remote_url, is_new_remote = create_remote_repo(args.repo)
+    sync_repository(args.repo, remote_url, is_new_remote)
 
 if __name__ == "__main__":
     main()
