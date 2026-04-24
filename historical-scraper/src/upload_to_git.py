@@ -87,7 +87,7 @@ def sync_repository(repo_name: str, remote_url: str, is_new_remote: bool) -> Non
     # 2. Build local files (overwriting existing ones)
     print("Loading submissions and generating local files...")
     try:
-        data_path = os.path.join(os.path.dirname(__file__), "data", "submissions_updated.json")
+        data_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "submissions_updated.json")
         with open(data_path, "r") as f:
             cache = json.load(f)
     except FileNotFoundError:

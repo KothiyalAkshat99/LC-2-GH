@@ -34,7 +34,7 @@ def fetch_metadata(submissions: dict[str, dict[str, list[int]]]) -> None:
     """
 
     updated_data = {}
-    updated_data_path = "data/submissions_updated.json"
+    updated_data_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "submissions_updated.json")
 
     # Load existing updated_data so we don't have to re-fetch metadata we already know
     if os.path.exists(updated_data_path):
@@ -103,7 +103,7 @@ def fetch_metadata(submissions: dict[str, dict[str, list[int]]]) -> None:
     
 
 def main() -> None:
-    data_path = "data/submissions_cache.json"
+    data_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "submissions_cache.json")
     
     with open(data_path, "r") as f:
         submissions = json.load(f)

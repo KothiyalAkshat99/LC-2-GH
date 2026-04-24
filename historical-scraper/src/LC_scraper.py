@@ -29,7 +29,7 @@ session.headers.update({
 def fetch_latest_timestamp() -> int:
     """Fetches the global maximum timestamp from the submissions cache to use as a watermark."""
     try:
-        data_path = os.path.join(os.path.dirname(__file__), "data", "submissions_cache.json")
+        data_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "submissions_cache.json")
         with open(data_path, "r") as f:
             submissions = json.load(f)
             
@@ -114,7 +114,7 @@ def dump_submissions(submissions: dict[int, list[dict]]) -> None:
     """Dump submissions to JSON file"""
     
     # Construct an absolute path relative to the script location
-    data_dir = os.path.join(os.path.dirname(__file__), "data")
+    data_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
     json_path = os.path.join(data_dir, "submissions_cache.json")
     
     # Create data directory if it doesn't exist
