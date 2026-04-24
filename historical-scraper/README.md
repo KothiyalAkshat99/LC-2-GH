@@ -7,6 +7,7 @@ This serves as the "batch sync" component of the larger **LC-2-GH** project, ens
 ---
 
 ## 🚀 Features
+*   **Idempotent Synchronization:** Safely run the script as many times as you want. It uses Timestamp Watermarking and KV Caching to only fetch and commit *new* data.
 *   **Authentication via Session Cookies:** Bypasses aggressive bot-detection systems (e.g., Cloudflare) by securely simulating your active browser session.
 *   **Internal API Reverse Engineering:** Queries LeetCode's undocumented internal GraphQL and REST APIs to pull down your complete submission history, source code, problem metadata, tags, and difficulty ratings.
 *   **Data Deduplication:** Merges multiple attempts at the same problem into a single file to keep your repository clean.
@@ -16,11 +17,11 @@ This serves as the "batch sync" component of the larger **LC-2-GH** project, ens
 
 ## 🛠️ Architecture
 
-The pipeline is split into three distinct phases to prevent data loss and respect API rate limits:
+The pipeline is split into three distinct modules located in the `src/` directory, managed by a central orchestrator:
 
-1.  **Extract (`LC_scraper.py`)**: Paginates through your submission history. It identifies all "Accepted" submissions and downloads the raw code, runtime, memory, and timestamps. Saves state to `data/submissions_cache.json`.
-2.  **Transform (`fetch_metadata.py`)**: Reads the cache and queries LeetCode's GraphQL API to discover the difficulty level and topic tags for each unique problem. Restructures the data to remove duplicates and groups all attempts by problem. Saves state to `data/submissions_updated.json`.
-3.  **Load (`upload_to_git.py`)**: Reads the final transformed JSON, generates the local directory structure (organized by Difficulty), creates metadata templates in the code files, and orchestrates the Git push.
+1.  **Extract (`src/LC_scraper.py`)**: Paginates through your submission history. It uses a high-water mark to stop fetching if it sees submissions it has already processed. Saves state to `data/submissions_cache.json`.
+2.  **Transform (`src/fetch_metadata.py`)**: Reads the cache and queries LeetCode's GraphQL API to discover the difficulty level and topic tags. It uses `data/submissions_updated.json` as a KV cache to avoid querying LeetCode for problems we already know the metadata for.
+3.  **Load (`src/upload_to_git.py`)**: Reads the final transformed JSON, generates the local directory structure (organized by Difficulty), creates metadata templates in the code files, and orchestrates the Git push. It performs `git status` checks to skip commits if nothing changed.
 
 ---
 
@@ -36,7 +37,7 @@ pip install -r requirements.txt
 ```
 
 ### 2. Configure Environment Variables
-Create a `.env` file in this directory. You will need to provide four keys:
+Create a `.env` file in this directory (`historical-scraper/.env`). You will need to provide four keys:
 ```env
 LEETCODE_SESSION=your_leetcode_session_cookie
 LEETCODE_CSRF_TOKEN=your_csrf_token
@@ -54,22 +55,12 @@ GITHUB_ID=your_github_username
 1. Go to GitHub -> Settings -> Developer Settings -> Personal Access Tokens (Classic).
 2. Generate a new token with the `repo` scope enabled.
 
-### 3. Run the ETL Pipeline
+### 3. Run the Pipeline
+You do not need to run the phases individually. Use the central orchestrator to run the entire ETL pipeline synchronously.
 
-Run the scripts in the following order. *Note: Do not spam the scripts, or LeetCode may temporarily rate-limit your IP.*
-
-**Step A: Extract**
 ```bash
-python LC_scraper.py
-```
-
-**Step B: Transform**
-```bash
-python fetch_metadata.py
-```
-
-**Step C: Load**
-```bash
-python upload_to_git.py --repo Your-Target-Repo-Name
+python main.py --repo Your-Target-Repo-Name
 ```
 *(If the repository does not exist on your GitHub account, the script will automatically create a private one for you.)*
+
+Because the pipeline is highly idempotent, it is completely safe to cancel it midway via `Ctrl+C`. The next time you run it, it will pick up exactly where it left off.
