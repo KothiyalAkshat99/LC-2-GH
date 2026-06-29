@@ -30,7 +30,7 @@ jobs:
           LEETCODE_SESSION: ${{ secrets.LEETCODE_SESSION }}
           LEETCODE_CSRF_TOKEN: ${{ secrets.LEETCODE_CSRF_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.SYNC_GITHUB_TOKEN }}
-          GITHUB_ID: ${{ secrets.GITHUB_ID }}
+          GITHUB_ID: ${{ secrets.GH_ID }}
         # Runs the scraper pointing to your target repo
         run: python historical-scraper/main.py --repo Github-Submissions
       - name: Commit and Push Cache Updates
