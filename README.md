@@ -15,18 +15,18 @@ Rather than relying purely on manual syncs, **LC-2-GH** combines a high-performa
 
 ```mermaid
 graph TD
-    subgraph LeetCode Platform
+    subgraph "LeetCode Platform"
         LC[LeetCode Web App]
         LC_API[Internal GraphQL/REST APIs]
     end
 
-    subgraph LC-2-GH Workspace (Monorepo)
+    subgraph "LC-2-GH Workspace (Monorepo)"
         Scraper[Historical Scraper / Python ETL]
         Ext[Chrome Browser Extension]
         GHA[GitHub Actions Cron Job]
     end
 
-    subgraph Target Output Repository
+    subgraph "Target Output Repository"
         OutputRepo[(Your Submissions Repo)]
     end
 
