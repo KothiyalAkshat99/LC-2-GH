@@ -67,7 +67,10 @@ def fetch_user_submissions() -> dict[int, list[dict]]:
 
         response = session.get(url)
 
-        if response.status_code == 200:
+        if response.status_code in [401, 403]:
+            raise PermissionError("LeetCode Session cookie has expired or is invalid. Please update repository secrets.")
+
+        elif response.status_code == 200:
             data = response.json()
 
             # LeetCode stores the actual list inside a key called 'submissions_dump'

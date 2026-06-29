@@ -75,7 +75,10 @@ def fetch_metadata(submissions: dict[str, dict[str, list[int]]]) -> None:
         
         response = session.post(graphql_url, json=payload)
         
-        if response.status_code == 200:
+        if response.status_code in [401, 403]:
+            raise PermissionError("LeetCode Session cookie has expired or is invalid. Please update repository secrets.")
+
+        elif response.status_code == 200:
             data = response.json()
             question_data = data.get("data", {}).get("question", {}) or {}
             

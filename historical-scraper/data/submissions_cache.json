@@ -923,6 +923,15 @@
             "memory": "19.3 MB",
             "code": "class Solution:\n    def wordBreak(self, s: str, wordDict: List[str]) -> bool:\n        wordDict = set(wordDict)\n        n = len(s)\n        dp = [False] * (n + 1)  # dp[i] represents if substring s[0:i] can be segmented\n\n        dp[0] = True    # Empty String base case\n\n        for i in range(1, n + 1):\n            for j in range(i):\n                # If first part is valid AND second part is a word\n                if dp[j] and s[j:i] in wordDict:\n                    dp[i] = True\n                    break   # Found valid segmentation at i, move to next i\n        \n        return dp[n]",
             "timestamp": 1772147966
+        },
+        {
+            "title": "Word Break",
+            "title_slug": "word-break",
+            "lang": "python3",
+            "runtime": "3 ms",
+            "memory": "19.4 MB",
+            "code": "class Solution:\n    def wordBreak(self, s: str, wordDict: List[str]) -> bool:\n        wordDict = set(wordDict)\n        memo = {}\n\n        def recur(i: int):\n            if i == len(s):\n                return True\n            \n            if i in memo:\n                return memo[i]\n            \n            for j in range(i + 1, len(s) + 1):\n                prefix = s[i:j] # Current word formed\n                \n                # If current substring in wordDict -> valid word\n                # AND \n                # if the substring starting at j also returns TRUE\n                if prefix in wordDict and \\\n                    recur(j):\n                    memo[i] = True\n                    return memo[i]\n            \n            memo[i] = False\n            return memo[i]\n        \n        return recur(0)",
+            "timestamp": 1776806960
         }
     ],
     "52": [
@@ -3862,6 +3871,15 @@
             "memory": "17.9 MB",
             "code": "class Solution:\n    def canPartition(self, nums: List[int]) -> bool:\n        total = sum(nums)\n        if total % 2 == 1:\n            return False\n        \n        target = total //2 \n\n        dp = [False] * (target + 1)\n        dp[0] = True\n\n        for n in nums:\n            for i in range(len(dp) -1, n-1, -1):\n                if dp[i]:continue\n                if dp[i-n]:dp[i] = True\n                if dp[-1]:return True\n        \n        return False",
             "timestamp": 1755725116
+        },
+        {
+            "title": "Partition Equal Subset Sum",
+            "title_slug": "partition-equal-subset-sum",
+            "lang": "python3",
+            "runtime": "680 ms",
+            "memory": "160.6 MB",
+            "code": "class Solution:\n    def canPartition(self, nums: List[int]) -> bool:\n        if len(nums) == 1:\n            return False\n\n        total_sum = sum(nums)\n        if total_sum % 2 != 0:  # Odd total sum cannot be partitioned\n            return False\n        \n        n = len(nums)\n        memo = {}\n\n        target_sum = total_sum // 2     # Target per partition\n        \n        # Since we have total_sum, we only need to track 1 half of the partition\n        def recur(i: int, curr_sum: int) -> bool:\n            if (i, curr_sum) in memo:\n                return memo[(i, curr_sum)]\n\n            if curr_sum == target_sum:\n                return True\n            \n            if i >= n or curr_sum > target_sum:\n                return False\n            \n            ret = recur(i + 1, curr_sum + nums[i]) or \\\n                  recur(i + 1, curr_sum)\n            \n            memo[(i, curr_sum)] = ret\n            return ret\n        \n        return recur(0, 0)",
+            "timestamp": 1776975130
         }
     ],
     "152": [
@@ -3873,6 +3891,24 @@
             "memory": "18.5 MB",
             "code": "class Solution:\n    def maxProduct(self, nums: List[int]) -> int:\n        maxprod = 1\n        minprod = 1\n        ret = max(nums)\n\n        for n in nums:\n            # Using minprod in case it is -ve \\\n            # and another -ve makes it > max +ve\n            temp = maxprod * n\n            maxprod = max(temp, minprod * n, n)\n            minprod = min(temp, minprod * n, n)\n\n            ret = max(ret, maxprod)\n        \n        return ret",
             "timestamp": 1755720838
+        },
+        {
+            "title": "Maximum Product Subarray",
+            "title_slug": "maximum-product-subarray",
+            "lang": "python3",
+            "runtime": "6 ms",
+            "memory": "19.7 MB",
+            "code": "class Solution:\n    def maxProduct(self, nums: List[int]) -> int:\n        # Kadane -> Should I start a fresh array at any pos, or should I extend \n        if len(nums) == 1:\n            return nums[0]\n        \n        max_prod, min_prod = 1, 1\n        ret = 0\n\n        for num in nums:\n            # If we hit a 0, it essentially resets the product streak to 0\n            \n            # Temporary storage because curMax changes before curMin is calculated\n            temp = max_prod * num\n            \n            # Three-way comparison: \n            # 1. New product with curMax\n            # 2. New product with curMin (handles negative * negative)\n            # 3. Just the current number (starts a fresh subarray)\n            max_prod = max(num * max_prod, num * min_prod, num)\n            min_prod = min(temp, num * min_prod, num)\n            \n            ret = max(ret, max_prod)\n            \n        return ret",
+            "timestamp": 1776700459
+        },
+        {
+            "title": "Maximum Product Subarray",
+            "title_slug": "maximum-product-subarray",
+            "lang": "python3",
+            "runtime": "3 ms",
+            "memory": "19.7 MB",
+            "code": "class Solution:\n    def maxProduct(self, nums: List[int]) -> int:\n        # Kadane -> Should I start a fresh array at any pos, or should I extend \n        if len(nums) == 1:\n            return nums[0]\n        \n        max_prod, min_prod = 1, 1\n        ret = 0\n\n        for num in nums:\n            # If current num is negative, \n            # We know that our max will become min (-ve),\n            # And min might become max (+ve)\n            if num < 0:\n                max_prod, min_prod = min_prod, max_prod\n            \n            max_prod = max(num, max_prod * num)\n            min_prod = min(num, min_prod * num)\n            \n            ret = max(ret, max_prod)\n            \n        return ret",
+            "timestamp": 1776700741
         }
     ],
     "322": [
@@ -3884,6 +3920,33 @@
             "memory": "18.1 MB",
             "code": "class Solution:\n    def coinChange(self, coins: List[int], amount: int) -> int:\n        dp = [amount + 1] * (amount + 1)\n        dp[0] = 0\n\n        for a in range(1, amount + 1):\n            for c in coins:\n                if a - c >= 0:\n                    dp[a] = min(dp[a], 1 + dp[a-c])\n        \n        return dp[amount] if dp[amount] != amount + 1 else -1",
             "timestamp": 1755720329
+        },
+        {
+            "title": "Coin Change",
+            "title_slug": "coin-change",
+            "lang": "python3",
+            "runtime": "1046 ms",
+            "memory": "69.2 MB",
+            "code": "class Solution:\n    def coinChange(self, coins: List[int], amount: int) -> int:\n        if not amount:\n            return 0\n\n        memo = {}\n\n        def recur(cursum: int) -> int:\n            if cursum > amount:\n                return -1\n            if cursum == amount:\n                return 0\n            if cursum in memo:\n                return memo[cursum]\n            \n            min_coins = float('inf')\n\n            for coin in coins:\n                ret = recur(cursum + coin)\n                if ret != -1:\n                    min_coins = min(min_coins, 1 + ret)\n\n            memo[cursum] = min_coins if min_coins != float('inf') else -1\n            return memo[cursum]\n        \n        return recur(0)",
+            "timestamp": 1776543224
+        },
+        {
+            "title": "Coin Change",
+            "title_slug": "coin-change",
+            "lang": "python3",
+            "runtime": "1100 ms",
+            "memory": "63 MB",
+            "code": "class Solution:\n    def coinChange(self, coins: List[int], amount: int) -> int:\n        if not amount:\n            return 0\n\n        coins.sort()\n        memo = {}\n\n        def recur(cursum: int) -> int:\n            if cursum > amount:\n                return -1\n            if cursum == amount:\n                return 0\n            if cursum in memo:\n                return memo[cursum]\n            \n            min_coins = float('inf')\n\n            for coin in coins:\n                ret = recur(cursum + coin)\n                if ret != -1:\n                    min_coins = min(min_coins, 1 + ret)\n\n            memo[cursum] = min_coins if min_coins != float('inf') else -1\n            return memo[cursum]\n        \n        return recur(0)",
+            "timestamp": 1776543262
+        },
+        {
+            "title": "Coin Change",
+            "title_slug": "coin-change",
+            "lang": "python3",
+            "runtime": "503 ms",
+            "memory": "19.5 MB",
+            "code": "class Solution:\n    def coinChange(self, coins: List[int], amount: int) -> int:\n        if not amount:\n            return 0\n        \n        dp = [amount + 1] * (amount + 1)\n        dp[0] = 0\n\n        for amt in range(1, amount + 1):\n            for coin in coins:\n                if amt - coin >= 0:\n                    dp[amt] = min(dp[amt], 1 + dp[amt - coin])\n        \n        return dp[amount] if dp[amount] != amount + 1 else -1\n\n\n        return memo[0]",
+            "timestamp": 1776544210
         }
     ],
     "678": [
@@ -4041,6 +4104,15 @@
             "memory": "18 MB",
             "code": "class Solution:\n    def numDecodings(self, s: str) -> int:\n        dp = {len(s):1}\n\n        def dfs(i):\n            if i in dp:\n                return dp[i]\n            \n            if s[i] == \"0\":\n                return 0\n            \n            ret = dfs(i + 1)\n            if i + 1 < len(s) and (s[i] == \"1\" or (s[i] == \"2\" and s[i+1] in \"0123456\")):\n                ret += dfs(i + 2)\n            \n            dp[i] = ret\n            return ret\n        \n        return dfs(0)",
             "timestamp": 1755205213
+        },
+        {
+            "title": "Decode Ways",
+            "title_slug": "decode-ways",
+            "lang": "python3",
+            "runtime": "0 ms",
+            "memory": "19.5 MB",
+            "code": "class Solution:\n    def numDecodings(self, s: str) -> int:\n        ret = 0\n        dp = {}\n\n        def dfs(i: int) -> int:\n            if i == len(s):\n                return 1\n            \n            if i in dp:\n                return dp[i]\n            \n            ret = 0\n\n            # Single Digit\n            if s[i] != \"0\":\n                ret += dfs(i + 1)\n            \n            # Two Digits\n            if i + 1 < len(s) and \\\n                (s[i] == \"1\" or \\\n                    s[i] == \"2\" and \\\n                    s[i+1] in \"0123456\"):\n                ret += dfs(i + 2)\n                        \n            dp[i] = ret\n            return ret\n        \n        return dfs(0)",
+            "timestamp": 1776463422
         }
     ],
     "3490": [
@@ -4347,6 +4419,15 @@
             "memory": "18 MB",
             "code": "class Solution:\n    def lengthOfLIS(self, nums: List[int]) -> int:\n        LIS = [1] * len(nums)\n\n        for i in range(len(nums), -1, -1): # Last to first\n            for j in range(i + 1, len(nums)):\n                if nums[i] < nums[j]:\n                    LIS[i] = max(LIS[i], 1 + LIS[j])\n        return max(LIS)",
             "timestamp": 1752276746
+        },
+        {
+            "title": "Longest Increasing Subsequence",
+            "title_slug": "longest-increasing-subsequence",
+            "lang": "python3",
+            "runtime": "1037 ms",
+            "memory": "19.4 MB",
+            "code": "class Solution:\n    def lengthOfLIS(self, nums: List[int]) -> int:\n        n = len(nums)\n        dp = [1] * n    # dp[i] = longest subsequence of nums[0..i]\n\n        for i in range(n):\n            for j in range(i):\n                if nums[i] > nums[j] and dp[i] < dp[j] + 1:\n                    dp[i] = dp[j] + 1\n        \n        return max(dp)",
+            "timestamp": 1776901628
         }
     ],
     "148": [
@@ -5568,6 +5649,70 @@
             "memory": "40.2 MB",
             "code": "\nclass Solution {\n    public int sum(int num1, int num2) {\n        return num1+num2;\n    }\n}",
             "timestamp": 1705469270
+        }
+    ],
+    "1231": [
+        {
+            "title": "Replace Elements with Greatest Element on Right Side",
+            "title_slug": "replace-elements-with-greatest-element-on-right-side",
+            "lang": "python3",
+            "runtime": "18 ms",
+            "memory": "20.4 MB",
+            "code": "class Solution:\n    def replaceElements(self, arr: List[int]) -> List[int]:\n        if len(arr) == 1:\n            return [-1]\n        \n        n = len(arr)\n        curr_max = arr[n - 1]\n        \n        for i in range(n - 2, -1, -1):\n            temp = arr[i]\n            arr[i] = curr_max\n            if temp > curr_max:\n                curr_max = temp\n        \n        arr[-1] = -1\n        return arr",
+            "timestamp": 1776694523
+        }
+    ],
+    "2199": [
+        {
+            "title": "Two Furthest Houses With Different Colors",
+            "title_slug": "two-furthest-houses-with-different-colors",
+            "lang": "python3",
+            "runtime": "0 ms",
+            "memory": "19.2 MB",
+            "code": "class Solution:\n    def maxDistance(self, colors: List[int]) -> int:\n        n = len(colors)\n        l = 0\n        r = n - 1\n\n        max_dist = 0\n\n        # Compare houses against FIRST And LAST house.\n        # Against last house -> find the first house which is different colored\n        for i in range(n):\n            if colors[i] != colors[n - 1]:\n                left = i    # Found first different color at i, so break\n                break\n        \n        # Against first house\n        for i in range(n - 1, -1, -1):\n            if colors[i] != colors[0]:\n                right = i\n                break\n        \n        # Max dist = either from first house or from last house\n        return max(right - 0, n - 1 - left)",
+            "timestamp": 1776693567
+        }
+    ],
+    "1984": [
+        {
+            "title": "Maximum Distance Between a Pair of Values",
+            "title_slug": "maximum-distance-between-a-pair-of-values",
+            "lang": "python3",
+            "runtime": "31 ms",
+            "memory": "36.1 MB",
+            "code": "class Solution:\n    def maxDistance(self, nums1: List[int], nums2: List[int]) -> int:\n        i = 0   # index for num1. Need to keep it AS LEFT as possible\n        j = 1   # index for num2. Need to keep it as RIGHT as possible\n\n        while i < len(nums1) and j < len(nums2):\n            if nums1[i] > nums2[j]:\n                i += 1\n            j += 1\n        \n        return j - i - 1",
+            "timestamp": 1776637960
+        },
+        {
+            "title": "Maximum Distance Between a Pair of Values",
+            "title_slug": "maximum-distance-between-a-pair-of-values",
+            "lang": "python3",
+            "runtime": "39 ms",
+            "memory": "35.8 MB",
+            "code": "class Solution:\n    def maxDistance(self, nums1: List[int], nums2: List[int]) -> int:\n        i = 0   # index for num1. Need to keep it AS LEFT as possible\n        j = 0   # index for num2. Need to keep it as RIGHT as possible\n\n        ret = 0\n        while i < len(nums1) and j < len(nums2):\n            if nums2[j] >= nums1[i]:\n                j += 1\n            else:\n                i += 1\n                j += 1\n            \n            ret = max(ret, j - i)\n        \n        return max(ret - 1, 0)",
+            "timestamp": 1776638046
+        }
+    ],
+    "4168": [
+        {
+            "title": "Mirror Distance of an Integer",
+            "title_slug": "mirror-distance-of-an-integer",
+            "lang": "python3",
+            "runtime": "0 ms",
+            "memory": "19.1 MB",
+            "code": "class Solution:\n    def mirrorDistance(self, n: int) -> int:\n        n_reverse = 0\n        m = n\n        while m:\n            n_reverse = n_reverse * 10 + m % 10\n            m = m // 10\n        \n        return abs(n - n_reverse)",
+            "timestamp": 1776544350
+        }
+    ],
+    "4139": [
+        {
+            "title": "Minimum Absolute Distance Between Mirror Pairs",
+            "title_slug": "minimum-absolute-distance-between-mirror-pairs",
+            "lang": "python3",
+            "runtime": "298 ms",
+            "memory": "42 MB",
+            "code": "class Solution:\n    def minMirrorPairDistance(self, nums: List[int]) -> int:\n        # hashmap[v] = most recent index (j) s.t. \\\n        # reverse(nums[j]) = v\n        hashmap = {}\n        min_dist = len(nums)\n\n        def reverseNumber(num: int) -> int:\n            temp = 0\n            while num:\n                temp = temp * 10 + num % 10\n                num = num // 10\n            return temp\n\n        for i, num in enumerate(nums):\n            num_reverse = reverseNumber(num)\n            # If num in hashmap, \\\n            # means that there is a previous index j \\\n            # s.t. reverse(nums[j]) = num\n            # (j, i) then forms a pair and we can update with (i - j)\n\n            # Thus we compute reverse(num) and set hmap[reverse] = i\\\n            # Indicates current index can form a pair with future elements\\\n            # whose value equals reverse(num)\n\n            # We keep most recent index always\n            if num in hashmap:\n                min_dist = min(min_dist, i - hashmap[num])\n            \n            hashmap[num_reverse] = i\n        \n        return -1 if min_dist == len(nums) else min_dist",
+            "timestamp": 1776459227
         }
     ]
 }
