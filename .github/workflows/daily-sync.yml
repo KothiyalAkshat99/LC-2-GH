@@ -7,6 +7,10 @@ on:
   # Allows you to run the workflow manually from the "Actions" tab on GitHub
   workflow_dispatch:
 
+permissions:
+  # Required to write the commit back to the repository
+  contents: write
+
 jobs:
   sync:
     runs-on: ubuntu-latest
