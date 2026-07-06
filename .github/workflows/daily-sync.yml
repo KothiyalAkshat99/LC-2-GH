@@ -26,9 +26,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r historical-scraper/requirements.txt
       - name: Configure Git
+        env:
+          GH_ID: ${{ secrets.GH_ID }}
+          GH_EMAIL: ${{ secrets.GH_EMAIL }}
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "$GH_ID"
+          git config --global user.email "$GH_EMAIL"
       - name: Run Scraper
         env:
           LEETCODE_SESSION: ${{ secrets.LEETCODE_SESSION }}
