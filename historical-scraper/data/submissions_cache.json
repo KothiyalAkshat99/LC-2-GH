@@ -3646,6 +3646,15 @@
             "memory": "48.4 MB",
             "code": "# Definition for singly-linked list.\n# class ListNode:\n#     def __init__(self, val=0, next=None):\n#         self.val = val\n#         self.next = next\nclass Solution:\n    def deleteMiddle(self, head: Optional[ListNode]) -> Optional[ListNode]:\n        if not head or not head.next:\n            return None\n        \n        dummy = None\n        slow = head\n        fast = head\n\n        while fast and fast.next:\n            dummy = slow\n            slow = slow.next\n            fast = fast.next.next\n        \n        dummy.next = slow.next\n        slow.next = None\n        slow = None\n\n        return head",
             "timestamp": 1756414401
+        },
+        {
+            "title": "Delete the Middle Node of a Linked List",
+            "title_slug": "delete-the-middle-node-of-a-linked-list",
+            "lang": "python3",
+            "runtime": "71 ms",
+            "memory": "62.4 MB",
+            "code": "# Definition for singly-linked list.\n# class ListNode:\n#     def __init__(self, val=0, next=None):\n#         self.val = val\n#         self.next = next\nclass Solution:\n    def deleteMiddle(self, head: Optional[ListNode]) -> Optional[ListNode]:\n        if not head or not head.next:\n            return None\n        \n        prev = None\n        slow, fast = head, head\n        \n        while fast and fast.next:\n            prev = slow\n            slow = slow.next\n            fast = fast.next.next\n        \n        prev.next = slow.next\n        slow.next = None\n        slow = None\n\n        return head",
+            "timestamp": 1781503444
         }
     ],
     "328": [
@@ -3958,6 +3967,15 @@
             "memory": "17.7 MB",
             "code": "class Solution:\n    def checkValidString(self, s: str) -> bool:\n        stk = []\n        ast = []\n\n        for i in range(len(s)):\n            c = s[i]\n            if c == \"(\":\n                stk.append(i)\n            elif c == \"*\":\n                ast.append(i)\n            else:\n                if stk:\n                    stk.pop()\n                elif ast:\n                    ast.pop()\n                else:\n                    return False\n        \n        while stk and ast:\n            # if remaining asterisk is before remaining OPEN bracket\n            if stk.pop() > ast.pop():\n                return False\n        \n        return not stk",
             "timestamp": 1755717444
+        },
+        {
+            "title": "Valid Parenthesis String",
+            "title_slug": "valid-parenthesis-string",
+            "lang": "python3",
+            "runtime": "0 ms",
+            "memory": "19.4 MB",
+            "code": "class Solution:\n    def checkValidString(self, s: str) -> bool:\n        par_left = []\n        ast = []\n\n        for i, char in enumerate(s):\n            if char == '(':\n                par_left.append(i)\n            elif char == '*':\n                ast.append(i)\n            else:\n                if par_left:\n                    par_left.pop()\n                elif ast:\n                    ast.pop()\n                else:\n                    return False\n            \n        while par_left and ast:\n            if par_left.pop() > ast.pop():  # If ast comes before '('\n                return False\n\n        return False if par_left else True",
+            "timestamp": 1780653908
         }
     ],
     "768": [
@@ -3969,6 +3987,15 @@
             "memory": "17.9 MB",
             "code": "class Solution:\n    def partitionLabels(self, s: str) -> List[int]:\n        lastIndex = {} # char -> last found index\n\n        for i, c in enumerate(s):\n            lastIndex[c] = i\n        \n        ret = []\n        size, end = 0, 0\n        for i, c in enumerate(s):\n            size += 1\n            if lastIndex[c] > end:\n                end = lastIndex[c]\n            \n            if i == end:\n                ret.append(size) # a partition has been completed\n                size = 0 # for new partition\n        \n        return ret",
             "timestamp": 1755638322
+        },
+        {
+            "title": "Partition Labels",
+            "title_slug": "partition-labels",
+            "lang": "python3",
+            "runtime": "3 ms",
+            "memory": "19.2 MB",
+            "code": "class Solution:\n    def partitionLabels(self, s: str) -> List[int]:\n        last_occurence = defaultdict(int)\n        ret = []\n\n        for i, char in enumerate(s):\n            last_occurence[char] = i\n        \n        partition_size = 0\n        partition_end = 0\n        for i, char in enumerate(s):\n            partition_size += 1\n            # If any char in current partition has last_idx > curr_end\n            if last_occurence[char] > partition_end:\n                partition_end = last_occurence[char]\n            \n            if i == partition_end:  # A partition has been completed\n                ret.append(partition_size)\n                partition_size = 0\n        \n        return ret",
+            "timestamp": 1780653280
         }
     ],
     "2026": [
@@ -3980,6 +4007,15 @@
             "memory": "55.3 MB",
             "code": "class Solution:\n    def mergeTriplets(self, triplets: List[List[int]], target: List[int]) -> bool:\n        ls = []\n        for i in range(len(triplets)):\n            if triplets[i][0] > target[0] or \\\n                triplets[i][1] > target[1] or \\\n                triplets[i][2] > target[2]:\n                continue\n            ls.append(triplets[i])\n        if not ls:\n            return False\n        print(ls)\n        n1, n2, n3 = 0,0,0\n        for i in ls:\n            if i[0] == target[0]:\n                n1 = 1\n            if i[1] == target[1]:\n                n2 = 1\n            if i[2] == target[2]:\n                n3 = 1\n        if not n1 or not n2 or not n3:\n            return False\n        return True",
             "timestamp": 1755635422
+        },
+        {
+            "title": "Merge Triplets to Form Target Triplet",
+            "title_slug": "merge-triplets-to-form-target-triplet",
+            "lang": "python3",
+            "runtime": "21 ms",
+            "memory": "54 MB",
+            "code": "class Solution:\n    def mergeTriplets(self, triplets: List[List[int]], target: List[int]) -> bool:\n        ret = [False] * 3   # Flips to true on match\n\n        x, y, z = target\n\n        for a, b, c in triplets:\n            if a > x or b > y or c > z:     # If triplet vals > target\n                continue\n            \n            if a == x:\n                ret[0] = True\n            if b == y:\n                ret[1] = True\n            if c == z:\n                ret[2] = True\n        \n        return False if False in ret else True",
+            "timestamp": 1780567622
         }
     ],
     "876": [
@@ -3991,6 +4027,15 @@
             "memory": "21 MB",
             "code": "class Solution:\n    def isNStraightHand(self, hand: List[int], groupSize: int) -> bool:\n        if len(hand) % groupSize != 0:\n            return False\n        \n        hand.sort()\n        hmap = {}\n        for i in range(len(hand)):\n            num = hand[i]\n            if num not in hmap:\n                hmap[num] = []\n            hmap[num].append(i)\n        print(hmap)\n        print(hand)\n        for i in range(len(hand)):\n            num = hand[i]\n\n            if num == -1: # If index has already been used\n                continue\n            print(f\"Num = {num}\")\n            for j in range(num, num + groupSize):\n                print(f\"{j} found in hmap\")\n                if j not in hmap: # if consecutive num not in hmap\n                    return False\n                temp = hmap[j].pop(0) # Get index of number from hmap\n                print(f\"{temp} popped from hmap\")\n                hand[temp] = -1 # Setting index as used\n                \n                if len(hmap[j]) == 0: # If no more occurences, delete from hmap\n                    del hmap[j]\n            print(\"--\")\n        return True",
             "timestamp": 1755548592
+        },
+        {
+            "title": "Hand of Straights",
+            "title_slug": "hand-of-straights",
+            "lang": "python3",
+            "runtime": "29 ms",
+            "memory": "21.2 MB",
+            "code": "class Solution:\n    def isNStraightHand(self, hand: List[int], groupSize: int) -> bool:\n        if len(hand) % groupSize != 0:\n            return False\n\n        card_count = Counter(hand)\n\n        for card in hand:\n            start_card = card\n            # Find start of potential straight\n            while card_count[start_card - 1]:\n                start_card -= 1\n            \n            # Process sequence starting from start_card\n            while start_card <= card:\n                while card_count[start_card]:\n                    for next_card in range(start_card, start_card + groupSize):\n                        if not card_count[next_card]:\n                            return False\n                        card_count[next_card] -= 1\n                start_card += 1\n        \n        return True",
+            "timestamp": 1780072440
         }
     ],
     "134": [
@@ -4002,6 +4047,24 @@
             "memory": "23.3 MB",
             "code": "class Solution:\n    def canCompleteCircuit(self, gas: List[int], cost: List[int]) -> int:\n        # No solution exists in this case\n        if sum(gas) < sum(cost):\n            return -1\n\n        # A solution exists \n\n        ret = 0\n        total = 0\n        for i in range(len(gas)):\n            total += (gas[i] - cost[i])\n\n            if total < 0:\n                total = 0\n                ret = i + 1\n                continue\n        # For this starting position, the total never dipped below 0\n        # after this position\n        return ret",
             "timestamp": 1755545016
+        },
+        {
+            "title": "Gas Station",
+            "title_slug": "gas-station",
+            "lang": "python3",
+            "runtime": "17 ms",
+            "memory": "25.9 MB",
+            "code": "class Solution:\n    def canCompleteCircuit(self, gas: List[int], cost: List[int]) -> int:\n        if sum(gas) < sum(cost):\n            return -1\n        \n        ret = 0\n        total = 0\n\n        for i in range(len(gas)):\n            total += (gas[i] - cost[i])\n\n            if total < 0:   # Kadane's\n                total = 0\n                ret = i + 1\n                continue\n        \n        return ret",
+            "timestamp": 1780070849
+        },
+        {
+            "title": "Gas Station",
+            "title_slug": "gas-station",
+            "lang": "python3",
+            "runtime": "12 ms",
+            "memory": "25.9 MB",
+            "code": "class Solution:\n    def canCompleteCircuit(self, gas: List[int], cost: List[int]) -> int:\n        # Only case of failure\n        if sum(gas) < sum(cost):\n            return -1\n        \n        ret = 0\n        total = 0\n\n        # A path is guaranteed\n        for i in range(len(gas)):\n            total += (gas[i] - cost[i])\n\n            # No station before this index can be the correct starting point.\n            # Because even though we had a headstart, we still fell below 0 fuel at this point.\n            # So we try again at index i + 1\n            # So any start index that allows us to reach the end on a net +ve is the valid start point.\n\n            if total < 0:   # Kadane's\n                total = 0\n                ret = i + 1\n                continue\n        \n        return ret",
+            "timestamp": 1781263674
         }
     ],
     "84": [
@@ -4042,6 +4105,24 @@
             "memory": "18.4 MB",
             "code": "class Solution:\n    def canJump(self, nums: List[int]) -> bool:\n        \n        reach = 0 # initially\n\n        for i in range(len(nums)):\n            if reach < i:\n                return False\n            \n            reach = max(reach, i + nums[i])\n            i += 1\n        \n        return True",
             "timestamp": 1755472239
+        },
+        {
+            "title": "Jump Game",
+            "title_slug": "jump-game",
+            "lang": "python3",
+            "runtime": "4 ms",
+            "memory": "20.2 MB",
+            "code": "class Solution:\n    def canJump(self, nums: List[int]) -> bool:\n        if len(nums) == 1:\n            return True\n        \n        n = len(nums)\n        goal = n - 1\n\n        for i in range(n - 2, -1, -1):\n            if i + nums[i] >= goal:     # If we can reach goal from i\n                goal = i\n            \n        if goal:\n            return False\n        \n        return True",
+            "timestamp": 1779555554
+        },
+        {
+            "title": "Jump Game",
+            "title_slug": "jump-game",
+            "lang": "python3",
+            "runtime": "19 ms",
+            "memory": "20.2 MB",
+            "code": "class Solution:\n    def canJump(self, nums: List[int]) -> bool:\n        curr_reach = 0\n\n        for i, val in enumerate(nums):\n            if curr_reach < i:\n                return False\n            \n            curr_reach = max(curr_reach, i + val)\n        \n        return True",
+            "timestamp": 1779792429
         }
     ],
     "729": [
@@ -4217,6 +4298,24 @@
             "memory": "18.8 MB",
             "code": "class Solution:\n    def jump(self, nums: List[int]) -> int:\n        # GREEDY BFS\n\n        ret = 0 # Counting number of jumps\n        l = r = 0 # Window of jump, being considered for BFS\n\n        while r < len(nums) - 1:\n            farthest = 0\n            for i in range(l, r + 1):\n                # Who can jump the farthest\n                farthest = max(farthest, i + nums[i])\n            l = r + 1\n            r = farthest\n            ret += 1\n        \n        return ret",
             "timestamp": 1753125790
+        },
+        {
+            "title": "Jump Game II",
+            "title_slug": "jump-game-ii",
+            "lang": "python3",
+            "runtime": "7 ms",
+            "memory": "20.1 MB",
+            "code": "class Solution:\n    def jump(self, nums: List[int]) -> int:\n        near = far = jumps = 0\n\n        while far < len(nums) - 1:\n            farthest = 0\n            for i in range(near, far + 1):\n                farthest = max(farthest, i + nums[i])\n            \n            near = far + 1\n            far = farthest\n            jumps += 1\n        \n        return jumps",
+            "timestamp": 1779654482
+        },
+        {
+            "title": "Jump Game II",
+            "title_slug": "jump-game-ii",
+            "lang": "python3",
+            "runtime": "5 ms",
+            "memory": "20 MB",
+            "code": "class Solution:\n    def jump(self, nums: List[int]) -> int:\n        if len(nums) == 1:\n            return 0\n        \n        # At each index, need to see what's the max reach we can get?\n        # Only increase jump count if new reach > current reach\n        curr_jump_end = 0\n        reach = 0\n        jumps = 0\n        for i in range(len(nums) - 1):\n            # Keeping track of absolute farthest we can reach\n            reach = max(reach, i + nums[i])\n\n            # If we've reached end of current jump's radius\n            if i == curr_jump_end:\n                jumps += 1\n                curr_jump_end = reach   # New jump radius\n            \n            if curr_jump_end >= len(nums) - 1:\n                break\n        \n        return jumps",
+            "timestamp": 1779883828
         }
     ],
     "210": [
@@ -4248,6 +4347,15 @@
             "memory": "32 MB",
             "code": "class Solution:\n    def maxSubArray(self, nums: List[int]) -> int:\n        if not nums:\n            return 0\n        if len(nums) == 1:\n            return nums[0]\n        \n        maxsum = nums[0]\n        currsum = maxsum\n\n        for i in range(1, len(nums)):\n            if currsum < 0:\n                currsum = 0\n            currsum += nums[i]\n            maxsum = max(maxsum, currsum)\n\n        return maxsum",
             "timestamp": 1752793866
+        },
+        {
+            "title": "Maximum Subarray",
+            "title_slug": "maximum-subarray",
+            "lang": "python3",
+            "runtime": "30 ms",
+            "memory": "31.2 MB",
+            "code": "class Solution:\n    def maxSubArray(self, nums: List[int]) -> int:\n        if len(nums) == 1:\n            return nums[0]\n\n        currsum = 0\n        maxsum = float('-inf')\n\n        for num in nums:\n            currsum = max(num, currsum + num)\n            maxsum = max(maxsum, currsum)\n        \n        return maxsum",
+            "timestamp": 1779282087
         }
     ],
     "1463": [
@@ -4830,6 +4938,15 @@
             "memory": "18.1 MB",
             "code": "class Solution:\n    def removeCoveredIntervals(self, intervals: List[List[int]]) -> int:\n        intervals.sort(key = lambda i: (i[0], -i[1])) # ASC interval start, DESC interval end\n\n        res = [intervals[0]]\n\n        for l, r in intervals[1:]:\n            prevL, prevR = res[-1]\n\n            if prevL <= l and prevR >= r:\n                continue\n            \n            res.append([l, r])\n\n        return len(res)",
             "timestamp": 1751231024
+        },
+        {
+            "title": "Remove Covered Intervals",
+            "title_slug": "remove-covered-intervals",
+            "lang": "python3",
+            "runtime": "5 ms",
+            "memory": "19.7 MB",
+            "code": "class Solution:\n    def removeCoveredIntervals(self, intervals: List[List[int]]) -> int:\n        # Interval Start in ASC, Interval End in Desc\n        intervals.sort(key = lambda i: (i[0], -i[1]))\n\n        stack = [intervals[0]]\n\n        for i in range(1, len(intervals)):\n            l, r = intervals[i]\n            prev_l, prev_r = stack[-1]\n\n            # Current intervals [l, r] is covered already, so continue\n            if prev_l <= l and prev_r >= r:\n                continue\n            \n            stack.append([l, r])\n        \n        return len(stack)",
+            "timestamp": 1783315600
         }
     ],
     "800": [
@@ -5403,6 +5520,15 @@
             "memory": "17.9 MB",
             "code": "class Solution:\n    def findThePrefixCommonArray(self, A: List[int], B: List[int]) -> List[int]:\n        hmap = {}\n        C = []\n        c = 0\n        for i in range(0, len(A)):\n            \n            if A[i] not in hmap:\n                hmap[A[i]] = 1\n            else:\n                c = c+1\n                del hmap[A[i]]\n            \n            if B[i] not in hmap:\n                hmap[B[i]] = 1\n            else:\n                c = c+1\n                del hmap[B[i]]\n            \n            C.append(c)\n        \n        return C\n",
             "timestamp": 1737162640
+        },
+        {
+            "title": "Find the Prefix Common Array of Two Arrays",
+            "title_slug": "find-the-prefix-common-array-of-two-arrays",
+            "lang": "python3",
+            "runtime": "6 ms",
+            "memory": "19.3 MB",
+            "code": "class Solution:\n    def findThePrefixCommonArray(self, A: List[int], B: List[int]) -> List[int]:\n        if len(A) == 1:\n            return [1]\n        \n        hashmap = defaultdict(int)\n        count = 0\n        ret = []\n\n        for i in range(len(A)):\n            hashmap[A[i]] += 1\n            if hashmap[A[i]] == 2:\n                count += 1\n            hashmap[B[i]] += 1\n            if hashmap[B[i]] == 2:\n                count += 1\n            \n            ret.append(count)\n        \n        return ret\n",
+            "timestamp": 1779282839
         }
     ],
     "485": [
@@ -5713,6 +5839,804 @@
             "memory": "42 MB",
             "code": "class Solution:\n    def minMirrorPairDistance(self, nums: List[int]) -> int:\n        # hashmap[v] = most recent index (j) s.t. \\\n        # reverse(nums[j]) = v\n        hashmap = {}\n        min_dist = len(nums)\n\n        def reverseNumber(num: int) -> int:\n            temp = 0\n            while num:\n                temp = temp * 10 + num % 10\n                num = num // 10\n            return temp\n\n        for i, num in enumerate(nums):\n            num_reverse = reverseNumber(num)\n            # If num in hashmap, \\\n            # means that there is a previous index j \\\n            # s.t. reverse(nums[j]) = num\n            # (j, i) then forms a pair and we can update with (i - j)\n\n            # Thus we compute reverse(num) and set hmap[reverse] = i\\\n            # Indicates current index can form a pair with future elements\\\n            # whose value equals reverse(num)\n\n            # We keep most recent index always\n            if num in hashmap:\n                min_dist = min(min_dist, i - hashmap[num])\n            \n            hashmap[num_reverse] = i\n        \n        return -1 if min_dist == len(nums) else min_dist",
             "timestamp": 1776459227
+        }
+    ],
+    "329": [
+        {
+            "title": "Longest Increasing Path in a Matrix",
+            "title_slug": "longest-increasing-path-in-a-matrix",
+            "lang": "python3",
+            "runtime": "105 ms",
+            "memory": "21.6 MB",
+            "code": "class Solution:\n    def longestIncreasingPath(self, matrix: List[List[int]]) -> int:\n        ROWS, COLS = len(matrix), len(matrix[0])\n        dp = [[-1] * COLS for _ in range(ROWS)]\n\n        def recur(r: int, c: int, prev: int) -> int:\n            if r < 0 or c < 0 or r >= ROWS or c >= COLS or \\\n                matrix[r][c] <= prev:\n                return 0\n            \n            if dp[r][c] != -1:\n                return dp[r][c]\n            \n            val = matrix[r][c]\n\n            dp[r][c] = max(\n                1 + recur(r - 1, c, val),   # Up\n                1 + recur(r + 1, c, val),   # Down\n                1 + recur(r, c - 1, val),   # Left\n                1 + recur(r, c + 1, val)    # Right\n            )\n\n            return dp[r][c]\n        \n        ret = 0\n        for r in range(ROWS):\n            for c in range(COLS):\n                ret = max(ret, recur(r, c, -1))\n        \n        return ret",
+            "timestamp": 1783271301
+        }
+    ],
+    "2582": [
+        {
+            "title": "Minimum Score of a Path Between Two Cities",
+            "title_slug": "minimum-score-of-a-path-between-two-cities",
+            "lang": "python3",
+            "runtime": "184 ms",
+            "memory": "75 MB",
+            "code": "class Solution:\n    def minScore(self, n: int, roads: List[List[int]]) -> int:\n        adj = defaultdict(list)\n\n        for u, v, d in roads:\n            adj[u].append((v, d))\n            adj[v].append((u, d))\n        \n        visited = set()\n        dq = deque([1])\n\n        ret = float('inf')\n\n        while dq:\n            u = dq.popleft()\n\n            for v, d in adj[u]:\n                ret = min(ret, d)\n\n                if v not in visited:\n                    visited.add(v)\n                    dq.append(v)\n        \n        return ret",
+            "timestamp": 1783154663
+        }
+    ],
+    "1240": [
+        {
+            "title": "Stone Game II",
+            "title_slug": "stone-game-ii",
+            "lang": "python3",
+            "runtime": "464 ms",
+            "memory": "34.1 MB",
+            "code": "class Solution:\n    def stoneGameII(self, piles: List[int]) -> int:\n        memo = {}\n        def recur(idx: int, M: int, alice: bool) -> int:\n            if idx == len(piles):\n                return 0\n            \n            if (idx, M, alice) in memo:\n                return memo[(idx, M, alice)]\n\n            ret = 0 if alice else float('inf')\n\n            total = 0\n            for X in range(1, 2 * M + 1):\n                if idx + X > len(piles):\n                    break\n\n                total += piles[idx + X - 1]\n\n                if alice:\n                    ret = max(\n                        ret, \\\n                        total + recur(idx + X, max(M, X), not alice)\n                        )\n                else:\n                    ret = min(\n                        ret, \\\n                        recur(idx + X, max(M, X), not alice)\n                        )\n            \n            memo[(idx, M, alice)] = ret\n            return ret\n        \n        return recur(0, 1, True)    # Turn = True(Alice), False(Bob)",
+            "timestamp": 1783070744
+        }
+    ],
+    "3468": [
+        {
+            "title": "Find the Encrypted String",
+            "title_slug": "find-the-encrypted-string",
+            "lang": "python3",
+            "runtime": "2 ms",
+            "memory": "19.4 MB",
+            "code": "class Solution:\n    def getEncryptedString(self, s: str, k: int) -> str:\n        n = len(s)\n        ret = [''] * n\n\n        k %= n\n\n        for i in range(n):\n            encr_char = s[(i + k) % n]\n            ret[i] = encr_char\n        \n        return ''.join(ret)",
+            "timestamp": 1782982467
+        }
+    ],
+    "97": [
+        {
+            "title": "Interleaving String",
+            "title_slug": "interleaving-string",
+            "lang": "python3",
+            "runtime": "49 ms",
+            "memory": "20.1 MB",
+            "code": "class Solution:\n    def isInterleave(self, s1: str, s2: str, s3: str) -> bool:\n        if len(s1) + len(s2) != len(s3):\n            return False\n        \n        memo = {}\n        \n        def recur(i: int, j: int) -> bool:      # s1_index, s2_index\n            if i == len(s1) and j == len(s2):\n                return True\n            \n            if (i, j) in memo:\n                return memo[(i, j)]\n            \n            # Choice A: Can we take a character from s1\n            if i < len(s1) and s1[i] == s3[i + j]:\n                if recur(i + 1, j):\n                    return True\n            \n            # Choice B: Can we take a character from s2\n            if j < len(s2) and s2[j] == s3[i + j]:\n                if recur(i, j + 1):\n                    return True\n            \n            memo[(i, j)] = False\n            return memo[(i, j)]\n        \n        return recur(0, 0)",
+            "timestamp": 1782981427
+        }
+    ],
+    "3558": [
+        {
+            "title": "Find a Safe Walk Through a Grid",
+            "title_slug": "find-a-safe-walk-through-a-grid",
+            "lang": "python3",
+            "runtime": "39 ms",
+            "memory": "19.5 MB",
+            "code": "class Solution:\n    def findSafeWalk(self, grid: List[List[int]], health: int) -> bool:\n        # 0-1 BFS \n        # Dijkstra but better\n        # While traversing edge with wt 0, push to front\n        # For wt 1, push to back\n        # Smaller distance cells are processed first\n        # And each queue op takes O(1) time\n\n        ROWS, COLS = len(grid), len(grid[0])\n        dist = [[float('inf')] * COLS for _ in range(ROWS)]\n        dirs = [(0, 1), (1, 0), (-1, 0), (0, -1)]\n\n        dq = deque()\n        dq.appendleft((0, 0))\n        dist[0][0] = grid[0][0]\n\n        while dq:\n            r, c = dq.popleft()\n            if r == ROWS - 1 and c == COLS - 1:\n                return True\n            \n            for dr, dc in dirs:\n                nr, nc = r + dr, c + dc\n\n                if nr < 0 or nc < 0 or nr >= ROWS or nc >= COLS:\n                    continue\n                \n                cost = dist[r][c] + grid[nr][nc]\n                if cost >= health:\n                    continue\n                \n                if cost < dist[nr][nc]:\n                    dist[nr][nc] = cost\n                    if grid[nr][nc] == 0:\n                        dq.appendleft((nr, nc))\n                    else:\n                        dq.append((nr, nc))\n        \n        return False",
+            "timestamp": 1782973457
+        }
+    ],
+    "909": [
+        {
+            "title": "Stone Game",
+            "title_slug": "stone-game",
+            "lang": "python3",
+            "runtime": "474 ms",
+            "memory": "139 MB",
+            "code": "class Solution:\n    def stoneGame(self, piles: List[int]) -> bool:\n        n = len(piles)\n        memo = {}\n        def recur(l: int, r: int) -> tuple:\n            if l > r:\n                return 0\n            \n            if (l, r) in memo:\n                return memo[(l, r)]\n            \n            parity = (r - l - n) % 2\n\n            if parity == 1:\n                score1 = recur(l + 1, r) + piles[l]\n                score2 = recur(l, r - 1) + piles[r]\n                memo[(l, r)] = max(score1, score2)\n                return memo[(l, r)]\n            \n            score1 = recur(l + 1, r) - piles[l]\n            score2 = recur(l, r - 1) - piles[r]\n            memo[(l, r)] = max(score1, score2)\n            return memo[(l, r)]\n\n        ret = recur(0, n - 1)\n        return True if ret else 0",
+            "timestamp": 1782902452
+        },
+        {
+            "title": "Stone Game",
+            "title_slug": "stone-game",
+            "lang": "python3",
+            "runtime": "0 ms",
+            "memory": "19.3 MB",
+            "code": "class Solution:\n    def stoneGame(self, piles: List[int]) -> bool:\n        return True",
+            "timestamp": 1782902498
+        }
+    ],
+    "494": [
+        {
+            "title": "Target Sum",
+            "title_slug": "target-sum",
+            "lang": "python3",
+            "runtime": "187 ms",
+            "memory": "74.4 MB",
+            "code": "class Solution:\n    def findTargetSumWays(self, nums: List[int], target: int) -> int:\n        # State = (index, currentSum)\n        memo = {}\n\n        def recur(idx: int, curr_sum: int) -> int:\n            # Base Cases -> If last index reached -> if currentSum == target or not\n            if idx == len(nums):\n                return 1 if curr_sum == target else 0\n            \n            if (idx, curr_sum) in memo:\n                return memo[(idx, curr_sum)]\n\n            # Decisions\n            positive = recur(idx + 1, curr_sum + nums[idx])\n            negative = recur(idx + 1, curr_sum - nums[idx])\n\n            # storing (pos + neg) as we're trying to count total number of ways\n            memo[(idx, curr_sum)] = positive + negative\n\n            return memo[(idx, curr_sum)]\n        \n        return recur(0, 0)",
+            "timestamp": 1782805527
+        }
+    ],
+    "1460": [
+        {
+            "title": "Number of Substrings Containing All Three Characters",
+            "title_slug": "number-of-substrings-containing-all-three-characters",
+            "lang": "python3",
+            "runtime": "123 ms",
+            "memory": "19.4 MB",
+            "code": "class Solution:\n    def numberOfSubstrings(self, s: str) -> int:\n        # If a substring from l to r is valid,\n        # then EVERY SUBSTRING that starts at l and ends ANYWHERE after r is VALID TOO obv.\n        # So we're not checking each and every substring but deducing mathematically.\n\n        # For 'abcabc'\n        # If l = 0, r = 2, substring = 'abc'\n        # then every substring starting at l and ending ANYWHERE after r is VALID too.\n        # So we increase count by (n - r)\n        # And then shrink window (increase l by 1, so as to now check from next l)\n        count = 0\n        hashmap = defaultdict(int)\n        l, r = 0, 0\n\n        while r < len(s):\n            hashmap[s[r]] += 1\n            \n            while hashmap['a'] > 0 and hashmap['b'] > 0 and hashmap['c'] > 0:\n                # All substrings from current window to end are valid\n                # Add count of valid substrings\n                count += len(s) - r\n\n                # Shrink the window from left\n                hashmap[s[l]] -= 1\n                l += 1\n            \n            r += 1\n        \n        return count",
+            "timestamp": 1782803250
+        }
+    ],
+    "518": [
+        {
+            "title": "Coin Change II",
+            "title_slug": "coin-change-ii",
+            "lang": "python3",
+            "runtime": "1564 ms",
+            "memory": "374.7 MB",
+            "code": "class Solution:\n    def change(self, amount: int, coins: List[int]) -> int:\n        ret = 0\n        memo = {}\n\n        def recur(i: int, a: int):\n            if a == amount:\n                return 1\n            if a > amount:\n                return 0\n            if i == len(coins):\n                return 0\n            if (i, a) in memo:\n                return memo[(i, a)]\n            \n            # Take current coin + Skip current coin\n            memo[(i, a)] = recur(i, a + coins[i]) + \\\n                            recur(i + 1, a)\n            \n            return memo[(i, a)]\n        \n        return recur(0, 0)",
+            "timestamp": 1782568099
+        },
+        {
+            "title": "Coin Change II",
+            "title_slug": "coin-change-ii",
+            "lang": "python3",
+            "runtime": "526 ms",
+            "memory": "65.4 MB",
+            "code": "class Solution:\n    def change(self, amount: int, coins: List[int]) -> int:\n        n = len(coins)\n        dp = [[0] * (amount + 1) for _ in range(n + 1)]\n\n        for i in range(n + 1):\n            dp[i][0] = 1\n\n        for i in range(1, n + 1):\n            for j in range(1, amount + 1):\n                if coins[i - 1] <= j:\n                    dp[i][j] = dp[i][j - coins[i - 1]] + dp[i - 1][j]\n                else:\n                    dp[i][j] = dp[i - 1][j]\n        \n        return dp[n][amount]",
+            "timestamp": 1782708869
+        }
+    ],
+    "2099": [
+        {
+            "title": "Number of Strings That Appear as Substrings in Word",
+            "title_slug": "number-of-strings-that-appear-as-substrings-in-word",
+            "lang": "python3",
+            "runtime": "0 ms",
+            "memory": "19.3 MB",
+            "code": "class Solution:\n    def numOfStrings(self, patterns: List[str], word: str) -> int:\n        count = 0\n        for pattern in patterns:\n            if pattern in word:\n                count += 1\n        \n        return count",
+            "timestamp": 1782708432
+        }
+    ],
+    "1956": [
+        {
+            "title": "Maximum Element After Decreasing and Rearranging",
+            "title_slug": "maximum-element-after-decreasing-and-rearranging",
+            "lang": "python3",
+            "runtime": "22 ms",
+            "memory": "28.3 MB",
+            "code": "class Solution:\n    def maximumElementAfterDecrementingAndRearranging(self, arr: List[int]) -> int:\n        arr.sort()\n        ret = 1     # 1 has to be in the final arr\n\n        for i in range(1, len(arr)):\n            # In the sorted array,\n            # every time (num - curr_max) >= 1, we increase curr_max by 1\n            if arr[i] >= ret + 1:\n                ret += 1\n        \n        return ret",
+            "timestamp": 1782636862
+        }
+    ],
+    "3299": [
+        {
+            "title": "Find the Maximum Number of Elements in Subset",
+            "title_slug": "find-the-maximum-number-of-elements-in-subset",
+            "lang": "python3",
+            "runtime": "96 ms",
+            "memory": "31.6 MB",
+            "code": "class Solution:\n    def maximumLength(self, nums: List[int]) -> int:\n        hashmap = Counter(nums)\n\n        one_count = hashmap.get(1, 0)\n\n        # ret is atleast the number of occurences of 1, rounded down to an odd number\n        ret = one_count if one_count % 2 else one_count - 1\n\n        hashmap.pop(1, None)\n\n        for num in hashmap:\n            res = 0\n            x = num\n            while x in hashmap and hashmap[x] > 1:\n                res += 2\n                x *= x\n            ret = max(ret, res + (1 if x in hashmap else -1))\n        \n        return ret",
+            "timestamp": 1782567096
+        }
+    ],
+    "4074": [
+        {
+            "title": "Count Subarrays With Majority Element I",
+            "title_slug": "count-subarrays-with-majority-element-i",
+            "lang": "python3",
+            "runtime": "1873 ms",
+            "memory": "19.4 MB",
+            "code": "class Solution:\n    def countMajoritySubarrays(self, nums: List[int], target: int) -> int:\n        n = len(nums)\n        ret = 0\n\n        for i in range(n):\n            target_count = 0\n\n            for j in range(i, n):\n                if nums[j] == target:\n                    target_count += 1\n                #else:\n                    #target_count -= 1\n                \n                subset_len = j - i + 1\n\n                if target_count > subset_len // 2:\n                    ret += 1\n        \n        return ret",
+            "timestamp": 1782455953
+        },
+        {
+            "title": "Count Subarrays With Majority Element I",
+            "title_slug": "count-subarrays-with-majority-element-i",
+            "lang": "python3",
+            "runtime": "1336 ms",
+            "memory": "19.5 MB",
+            "code": "class Solution:\n    def countMajoritySubarrays(self, nums: List[int], target: int) -> int:\n        n = len(nums)\n        ret = 0\n\n        # Boyer-Moore Majority Voting Algo\n        for i in range(n):\n            target_count = 0\n\n            for j in range(i, n):\n                if nums[j] == target:\n                    target_count += 1\n                else:\n                    target_count -= 1\n                \n                if target_count > 0:\n                    ret += 1\n        \n        return ret",
+            "timestamp": 1782456069
+        }
+    ],
+    "3219": [
+        {
+            "title": "Make Lexicographically Smallest Array by Swapping Elements",
+            "title_slug": "make-lexicographically-smallest-array-by-swapping-elements",
+            "lang": "python3",
+            "runtime": "241 ms",
+            "memory": "95.4 MB",
+            "code": "class Solution:\n    def lexicographicallySmallestArray(self, nums: List[int], limit: int) -> List[int]:\n        groups = []\n        num_to_group = {}     # nums[i] -> groups index\n\n        for num in sorted(nums):\n            if not groups or abs(num - groups[-1][-1]) > limit:\n                groups.append(deque())\n            \n            groups[-1].append(num)\n            num_to_group[num] = len(groups) - 1\n        \n        ret = []\n\n        for num in nums:\n            j = num_to_group[num]\n            ret.append(groups[j].popleft())\n        \n        return ret",
+            "timestamp": 1782416807
+        }
+    ],
+    "2327": [
+        {
+            "title": "Largest Number After Digit Swaps by Parity",
+            "title_slug": "largest-number-after-digit-swaps-by-parity",
+            "lang": "python3",
+            "runtime": "0 ms",
+            "memory": "19.4 MB",
+            "code": "class Solution:\n    def largestInteger(self, num: int) -> int:\n        odd_maxheap = []\n        even_maxheap = []\n        num = str(num)\n        n = len(num)\n\n        for char in num:\n            if int(char) % 2 == 0:\n                even_maxheap.append(int(char))\n            else:\n                odd_maxheap.append(int(char))\n        \n        heapq.heapify_max(even_maxheap)\n        heapq.heapify_max(odd_maxheap)\n\n        ret = []\n        for idx in range(n):\n            if int(num[idx]) % 2 == 0:\n                digit = heapq.heappop_max(even_maxheap)\n            else:\n                digit = heapq.heappop_max(odd_maxheap)\n            ret.append(str(digit))\n        \n        return int(''.join(ret))",
+            "timestamp": 1782286903
+        }
+    ],
+    "1308": [
+        {
+            "title": "Smallest String With Swaps",
+            "title_slug": "smallest-string-with-swaps",
+            "lang": "python3",
+            "runtime": "127 ms",
+            "memory": "62.6 MB",
+            "code": "class Solution:\n    def smallestStringWithSwaps(self, s: str, pairs: List[List[int]]) -> str:\n        # Each index represents a vertex\n        # Each pair (i, j) is an undirected edge between vertices i and j\n        # Use DFS to traverse each component and collect:\n        #   1. Characters corresponding to those indices\n        #   2. Indices themselves\n        # SORT both characters and their indices (for each connected component)\n        # Place sorted characters back into result array at sorted indices\n         \n        adj = defaultdict(list)\n        visited = set()\n\n        for u, v in pairs:\n            adj[u].append(v)\n            adj[v].append(u)\n        \n        # Explores connected components\n        def dfs(vertex: int, characters: list, indices: list) -> None:\n            characters.append(s[vertex])\n            indices.append(vertex)\n\n            for nb in adj[vertex]:\n                if nb not in visited:\n                    visited.add(nb)\n                    dfs(nb, characters, indices)\n        \n        ret = [''] * len(s)\n        \n        # Explores all components\n        for idx, char in enumerate(s):\n            if idx not in visited:\n                visited.add(idx)\n                characters, indices = [], []\n                dfs(idx, characters, indices)\n\n                # Sort and Re-assign smallest possible characters\n                characters.sort()\n                indices.sort()\n\n                for i in range(len(indices)):\n                    ret[indices[i]] = characters[i]\n        \n        return ''.join(ret)",
+            "timestamp": 1782286121
+        }
+    ],
+    "3330": [
+        {
+            "title": "Modify the Matrix",
+            "title_slug": "modify-the-matrix",
+            "lang": "python3",
+            "runtime": "3 ms",
+            "memory": "19.3 MB",
+            "code": "class Solution:\n    def modifiedMatrix(self, matrix: List[List[int]]) -> List[List[int]]:\n        ROWS, COLS = len(matrix), len(matrix[0])\n\n        for c in range(COLS):\n            max_val = matrix[0][c]\n\n            for r in range(ROWS):\n                max_val = max(max_val, matrix[r][c])\n            \n            for r in range(ROWS):\n                if matrix[r][c] == -1:\n                    matrix[r][c] = max_val\n        \n        return matrix",
+            "timestamp": 1782211213
+        }
+    ],
+    "309": [
+        {
+            "title": "Best Time to Buy and Sell Stock with Cooldown",
+            "title_slug": "best-time-to-buy-and-sell-stock-with-cooldown",
+            "lang": "python3",
+            "runtime": "4 ms",
+            "memory": "21.3 MB",
+            "code": "class Solution:\n    def maxProfit(self, prices: List[int]) -> int:\n        # State: Buying or selling\n        # If Buy: i + 1\n        # If Sell: i + 2\n        \n        dp = {}     # Key=(i, buying), val=max_profit\n\n        def recur(i: int, buying: bool):\n            if i >= len(prices):\n                return 0\n            \n            if (i, buying) in dp:\n                return dp[(i, buying)]\n            \n            if buying:      # If we're in buying state\n                buy = recur(i + 1, not buying) - prices[i]        # If we buy at current index\n                cooldown = recur(i + 1, buying)\n                dp[(i, buying)] = max(buy, cooldown)\n            else:\n                sell = recur(i + 2, not buying) + prices[i]\n                cooldown = recur(i + 1, buying)\n                dp[(i, buying)] = max(sell, cooldown)\n            \n            return dp[(i, buying)]\n        \n        return recur(0, True)",
+            "timestamp": 1782210458
+        }
+    ],
+    "1297": [
+        {
+            "title": "Maximum Number of Balloons",
+            "title_slug": "maximum-number-of-balloons",
+            "lang": "python3",
+            "runtime": "3 ms",
+            "memory": "19.2 MB",
+            "code": "class Solution:\n    def maxNumberOfBalloons(self, text: str) -> int:\n        char_map = Counter(text)\n        balloon = Counter('balloon')\n        ret_count = len(text)\n        \n        for char in balloon:\n            ret_count = min(ret_count, char_map[char] // balloon[char])\n        \n        return ret_count",
+            "timestamp": 1782104526
+        }
+    ],
+    "1961": [
+        {
+            "title": "Maximum Ice Cream Bars",
+            "title_slug": "maximum-ice-cream-bars",
+            "lang": "python3",
+            "runtime": "84 ms",
+            "memory": "32 MB",
+            "code": "class Solution:\n    def maxIceCream(self, costs: List[int], coins: int) -> int:\n        costs.sort()\n        if coins < costs[0]:\n            return 0\n        \n        count = 0\n        for cost in costs:\n            if cost <= coins:\n                coins -= cost\n                count += 1\n            else:\n                break\n        \n        return count",
+            "timestamp": 1782031101
+        }
+    ],
+    "1130": [
+        {
+            "title": "Last Stone Weight II",
+            "title_slug": "last-stone-weight-ii",
+            "lang": "python3",
+            "runtime": "31 ms",
+            "memory": "27 MB",
+            "code": "class Solution:\n    def lastStoneWeightII(self, stones: List[int]) -> int:\n        # KNAPSACK\n        n = len(stones)\n        sum_stones = sum(stones)\n        target = ceil(sum_stones / 2)\n\n        # Suppose sum of stones = 23\n        # Thru dfs, we find a total of 12.\n        # Means there's another half with total of 11\n        # Therefore, difference would be 23-12 == 12-11 == 0\n\n        dp = {}\n\n        def dfs(i: int, curr_total: int):\n            if curr_total >= target or i == len(stones):\n                return abs(curr_total - (sum_stones - curr_total))\n            \n            if (i, curr_total) in dp:\n                return dp[(i, curr_total)]\n            \n            dp[(i, curr_total)] = min(\n                dfs(i + 1, curr_total), # Not taking current stone\n                dfs(i + 1, curr_total + stones[i])  # Take current stone\n            )\n            \n            return dp[(i, curr_total)]\n            \n        return dfs(0, 0)",
+            "timestamp": 1781937203
+        }
+    ],
+    "1833": [
+        {
+            "title": "Find the Highest Altitude",
+            "title_slug": "find-the-highest-altitude",
+            "lang": "python3",
+            "runtime": "0 ms",
+            "memory": "19.1 MB",
+            "code": "class Solution:\n    def largestAltitude(self, gain: List[int]) -> int:\n        altitude = 0\n        max_alt = 0\n\n        for val in gain:\n            altitude += val\n            max_alt = max(altitude, max_alt)\n        \n        return max_alt",
+            "timestamp": 1781857893
+        }
+    ],
+    "1446": [
+        {
+            "title": "Angle Between Hands of a Clock",
+            "title_slug": "angle-between-hands-of-a-clock",
+            "lang": "python3",
+            "runtime": "0 ms",
+            "memory": "19.4 MB",
+            "code": "class Solution:\n    def angleClock(self, hour: int, minutes: int) -> float:\n        hour %= 12\n        \n        # Full Circle = 360\n        # Minute hand completes 1 full circle in 60 minutes\n        # Each minute represents 6 deg\n        minute_angle = minutes * 6.0\n\n        # 12hours, where each hour = 30 deg\n        # Hour hand moves 0.5deg every minute\n        # This adjusts hour hand movement according to minutes\n        hour_angle = hour * 30.0 + minutes * 0.5\n\n        diff = abs(hour_angle - minute_angle)\n\n        return min(diff, 360.0 - diff)",
+            "timestamp": 1781774219
+        }
+    ],
+    "1250": [
+        {
+            "title": "Longest Common Subsequence",
+            "title_slug": "longest-common-subsequence",
+            "lang": "python3",
+            "runtime": "337 ms",
+            "memory": "44.2 MB",
+            "code": "class Solution:\n    def longestCommonSubsequence(self, text1: str, text2: str) -> int:\n        len1 = len(text1)\n        len2 = len(text2)\n        dp = [[0]*(len2 + 1) for _ in range(len1 + 1)]\n        \n        for i in range(len1):\n            for j in range(len2):\n                if text1[i] == text2[j]:\n                    dp[i + 1][j + 1] = 1 + dp[i][j]\n                else:\n                    dp[i + 1][j + 1] = max(\n                        dp[i + 1][j], dp[i][j + 1]\n                    )\n\n        return dp[len1][len2]",
+            "timestamp": 1781773617
+        }
+    ],
+    "64": [
+        {
+            "title": "Minimum Path Sum",
+            "title_slug": "minimum-path-sum",
+            "lang": "python3",
+            "runtime": "25 ms",
+            "memory": "23.1 MB",
+            "code": "class Solution:\n    def minPathSum(self, grid: List[List[int]]) -> int:\n        ROWS, COLS = len(grid), len(grid[0])\n        dp = [[-1]*COLS for _ in range(ROWS)]\n\n        def recur(r: int, c: int) -> int:\n            if r == ROWS or c == COLS:\n                return float('inf')\n            \n            if r == ROWS - 1 and c == COLS - 1:\n                return grid[r][c]\n            \n            if dp[r][c] != -1:\n                return dp[r][c]\n            \n            ret = min(recur(r+1, c), recur(r, c+1))\n            dp[r][c] = grid[r][c] + ret\n\n            return dp[r][c]\n        \n        return recur(0, 0)",
+            "timestamp": 1781682672
+        }
+    ],
+    "3939": [
+        {
+            "title": "Process String with Special Operations II",
+            "title_slug": "process-string-with-special-operations-ii",
+            "lang": "python3",
+            "runtime": "367 ms",
+            "memory": "20.4 MB",
+            "code": "class Solution:\n    def processStr(self, s: str, k: int) -> str:\n        # Length of result can reach 10**15\n        # Therefore impossible to explicitly construct\n\n        # We work backwards to find which pos in an earlier state of \\\n        # result corresponds to k\n        # Since final length is unknown, we only simulate length\n\n        length = 0\n        # Simulating only length of result, not the actual string\n        for char in s:\n            if 97 <= ord(char) <= 122:\n                length += 1\n            elif char == '*':\n                if length:\n                    length -= 1\n            elif char == '#':\n                length *= 2\n            elif char == '%':\n                pass\n        \n        # If explicitly OOB\n        if k + 1 > length:\n            return '.'\n        \n        # We traverse 's' from R to L\n        # and reverse each operation\n        # '*' now makes length + 1 since it deleted a char earlier\n        # '#'\n        # '%'\n        for c in reversed(s):\n            if c == '*':\n                length += 1\n            elif c == '#':\n                if k + 1 > (length + 1) // 2:   # k lies in 2nd half\n                    k -= length // 2\n                length = (length + 1) // 2\n            elif c == '%':\n                k = length - k - 1\n            else:\n                if k + 1 == length:\n                    return c\n                length -= 1\n        return '.'",
+            "timestamp": 1781677915
+        }
+    ],
+    "63": [
+        {
+            "title": "Unique Paths II",
+            "title_slug": "unique-paths-ii",
+            "lang": "python3",
+            "runtime": "116 ms",
+            "memory": "19.6 MB",
+            "code": "class Solution:\n    def uniquePathsWithObstacles(self, obstacleGrid: List[List[int]]) -> int:\n        ROWS, COLS = len(obstacleGrid), len(obstacleGrid[0])\n        memo = [[0] * COLS for _ in range(ROWS)]\n\n        def recur(r: int, c: int) -> int:\n            # Base Case - OOB or obstacle found\n            if r < 0 or r >= ROWS or c < 0 or c >= COLS or obstacleGrid[r][c]:\n                return 0\n            \n            if r == ROWS - 1 and c == COLS - 1:\n                return 1\n            \n            if memo[r][c]:\n                return memo[r][c]\n            \n            memo[r][c] = recur(r + 1, c) + recur(r, c + 1)\n            return memo[r][c]\n        \n        return recur(0, 0)",
+            "timestamp": 1781603809
+        }
+    ],
+    "3931": [
+        {
+            "title": "Process String with Special Operations I",
+            "title_slug": "process-string-with-special-operations-i",
+            "lang": "python3",
+            "runtime": "45 ms",
+            "memory": "28.3 MB",
+            "code": "class Solution:\n    def processStr(self, s: str) -> str:\n        result = []\n\n        for char in s:\n            if 97 <= ord(char) <= 122:\n                result.append(char)\n            elif char == '*':\n                if result:\n                    result.pop()\n            elif char == '#':\n                result = result + result\n            elif char == '%':\n                result = result[::-1]\n        \n        return ''.join(result)",
+            "timestamp": 1781603453
+        }
+    ],
+    "62": [
+        {
+            "title": "Unique Paths",
+            "title_slug": "unique-paths",
+            "lang": "python3",
+            "runtime": "4 ms",
+            "memory": "19.9 MB",
+            "code": "class Solution:\n    def uniquePaths(self, m: int, n: int) -> int:\n        memo = {}\n        \n        def recur(r, c):\n            # Out of bounds\n            if r >= m or c >= n:\n                return 0\n            # If we reach end of board\n            if r == m - 1 and c == n - 1:\n                return 1\n            # If (r, c) in cache\n            if (r, c) in memo:\n                return memo[(r, c)]\n\n            ret = recur(r + 1, c) + recur(r, c + 1)\n            memo[(r, c)] = ret\n            return memo[(r, c)]\n        \n        return recur(0, 0)",
+            "timestamp": 1781506688
+        }
+    ],
+    "2236": [
+        {
+            "title": "Maximum Twin Sum of a Linked List",
+            "title_slug": "maximum-twin-sum-of-a-linked-list",
+            "lang": "python3",
+            "runtime": "52 ms",
+            "memory": "62.5 MB",
+            "code": "# Definition for singly-linked list.\n# class ListNode:\n#     def __init__(self, val=0, next=None):\n#         self.val = val\n#         self.next = next\nclass Solution:\n    def pairSum(self, head: Optional[ListNode]) -> int:\n        half = []\n        slow = head\n        fast = head\n\n        while fast and fast.next:\n            half.append(slow.val)\n            slow = slow.next\n            fast = fast.next.next\n        \n        ret = 0\n        while slow:\n            ret = max(ret, half.pop() + slow.val)\n            slow = slow.next\n        \n        return ret",
+            "timestamp": 1781459513
+        }
+    ],
+    "4216": [
+        {
+            "title": "Weighted Word Mapping",
+            "title_slug": "weighted-word-mapping",
+            "lang": "python3",
+            "runtime": "7 ms",
+            "memory": "19.3 MB",
+            "code": "class Solution:\n    def mapWordWeights(self, words: List[str], weights: List[int]) -> str:\n        ret = []\n        for word in words:\n            s = 0\n            for c in word:\n                s += weights[ord(c) - ord('a')]\n            ret.append(chr(ord('z') - s % 26))\n        \n        return \"\".join(ret)",
+            "timestamp": 1781373180
+        }
+    ],
+    "3844": [
+        {
+            "title": "Number of Ways to Assign Edge Weights I",
+            "title_slug": "number-of-ways-to-assign-edge-weights-i",
+            "lang": "python3",
+            "runtime": "366 ms",
+            "memory": "114 MB",
+            "code": "class Solution:\n    def assignEdgeWeights(self, edges: List[List[int]]) -> int:\n        MOD = 10**9 + 7\n\n        n = len(edges) + 1\n        adj = [[] for _ in range(n + 1)]\n        \n        for u, v in edges:\n            adj[u].append(v)\n            adj[v].append(u)\n        \n        def dfs(u: int, f: int) -> int:\n            max_dp = 0\n            for v in adj[u]:\n                if v == f:\n                    continue\n                max_dp = max(max_dp, dfs(v, u) + 1)\n            return max_dp\n        \n        max_depth = dfs(1, 0)\n\n        return pow(2, max_depth - 1, MOD)",
+            "timestamp": 1781264107
+        }
+    ],
+    "135": [
+        {
+            "title": "Candy",
+            "title_slug": "candy",
+            "lang": "python3",
+            "runtime": "23 ms",
+            "memory": "21.5 MB",
+            "code": "class Solution:\n    def candy(self, ratings: List[int]) -> int:\n        n = len(ratings)\n        candies = [1] * n   # Each child gets atleast 1 candy\n\n        for i in range(1, n):\n            if ratings[i] > ratings[i - 1]:\n                candies[i] = candies[i - 1] + 1\n        \n        count = 0       # To track min total candies\n        for i in range(n - 1, 0, -1):\n            if ratings[i - 1] > ratings[i]:\n                candies[i - 1] = max(candies[i] + 1, candies[i - 1])\n            count += candies[i - 1]     # Sums up [0, n-2] in candies\n        \n        return count + candies[n - 1]   # Adding last value ",
+            "timestamp": 1780740688
+        }
+    ],
+    "2714": [
+        {
+            "title": "Left and Right Sum Differences",
+            "title_slug": "left-and-right-sum-differences",
+            "lang": "python3",
+            "runtime": "3 ms",
+            "memory": "19.2 MB",
+            "code": "class Solution:\n    def leftRightDifference(self, nums: List[int]) -> List[int]:\n        n = len(nums)\n        ret = [0] * n\n\n        left_sum = 0\n        for i in range(n):\n            ret[i] = left_sum\n            left_sum += nums[i]\n        \n        right_sum = 0\n        for i in range(n - 1, -1, -1):\n            ret[i] = abs(ret[i] - right_sum)\n            right_sum += nums[i]\n        \n        return ret",
+            "timestamp": 1780740262
+        }
+    ],
+    "4057": [
+        {
+            "title": "Total Waviness of Numbers in Range I",
+            "title_slug": "total-waviness-of-numbers-in-range-i",
+            "lang": "python3",
+            "runtime": "352 ms",
+            "memory": "19.2 MB",
+            "code": "class Solution:\n    def totalWaviness(self, num1: int, num2: int) -> int:\n        if num1 < 100:\n            if num2 < 100:\n                return 0\n            num1 = 100\n\n\n        def waviness(n: int) -> int:\n            s = str(n)\n            wav = 0\n            for a, b, c in zip(s, s[1:], s[2:]):\n                if (a > b < c) or (a < b > c):\n                    wav += 1\n            \n            return wav\n\n\n        ret = 0\n        \n        for n in range(num1, num2 + 1):\n            ret += waviness(n)\n        \n        return ret",
+            "timestamp": 1780568531
+        }
+    ],
+    "3967": [
+        {
+            "title": "Earliest Finish Time for Land and Water Rides II",
+            "title_slug": "earliest-finish-time-for-land-and-water-rides-ii",
+            "lang": "python3",
+            "runtime": "122 ms",
+            "memory": "35 MB",
+            "code": "class Solution:\n    def earliestFinishTime(self, landStartTime: List[int], landDuration: List[int], waterStartTime: List[int], waterDuration: List[int]) -> int:\n        # Find Earliest for Land, then use it to find min overall\n        # Reverse -> Earliest water, then find min overall\n\n        def solve(st1: list, dur1: list, st2: list, dur2: list):\n            fin1 = inf\n            for i in range(len(st1)):\n                fin1 = min(fin1, st1[i] + dur1[i])\n            \n            fin2 = inf\n            for i in range(len(st2)):\n                fin2 = min(fin2, max(st2[i], fin1) + dur2[i])\n            \n            return fin2\n        \n        land_water = solve(landStartTime, landDuration, waterStartTime, waterDuration)\n        \n        water_land = solve(waterStartTime, waterDuration, landStartTime, landDuration)\n\n        return min(land_water, water_land)",
+            "timestamp": 1780524291
+        }
+    ],
+    "3965": [
+        {
+            "title": "Earliest Finish Time for Land and Water Rides I",
+            "title_slug": "earliest-finish-time-for-land-and-water-rides-i",
+            "lang": "python3",
+            "runtime": "287 ms",
+            "memory": "19.3 MB",
+            "code": "class Solution:\n    def earliestFinishTime(self, landStartTime: List[int], landDuration: List[int], waterStartTime: List[int], waterDuration: List[int]) -> int:\n        # Brute Force\n        n = len(landStartTime)\n        m = len(waterStartTime)\n        ret = inf\n\n        for i in range(n):\n            for j in range(m):\n                land = landStartTime[i] + landDuration[i]\n                land_water = max(land, waterStartTime[j]) + waterDuration[j]\n                ret = min(ret, land_water)\n\n                water = waterStartTime[j] + waterDuration[j]\n                water_land = max(water, landStartTime[i]) + landDuration[i]\n                ret = min(ret, water_land)\n        \n        return ret",
+            "timestamp": 1780393330
+        },
+        {
+            "title": "Earliest Finish Time for Land and Water Rides I",
+            "title_slug": "earliest-finish-time-for-land-and-water-rides-i",
+            "lang": "python3",
+            "runtime": "15 ms",
+            "memory": "19.4 MB",
+            "code": "class Solution:\n    def earliestFinishTime(self, landStartTime: List[int], landDuration: List[int], waterStartTime: List[int], waterDuration: List[int]) -> int:\n        # Find Earliest for Land, then use it to find min overall\n        # Reverse -> Earliest water, then find min overall\n\n        def solve(st1: list, dur1: list, st2: list, dur2: list):\n            fin1 = inf\n            for i in range(len(st1)):\n                fin1 = min(fin1, st1[i] + dur1[i])\n            \n            fin2 = inf\n            for i in range(len(st2)):\n                fin2 = min(fin2, max(st2[i], fin1) + dur2[i])\n            \n            return fin2\n        \n        land_water = solve(landStartTime, landDuration, waterStartTime, waterDuration)\n        \n        water_land = solve(waterStartTime, waterDuration, landStartTime, landDuration)\n\n        return min(land_water, water_land)",
+            "timestamp": 1780393628
+        }
+    ],
+    "649": [
+        {
+            "title": "Dota2 Senate",
+            "title_slug": "dota2-senate",
+            "lang": "python3",
+            "runtime": "11 ms",
+            "memory": "19.6 MB",
+            "code": "class Solution:\n    def predictPartyVictory(self, senate: str) -> str:\n        r, d = deque(), deque()\n        n = len(senate)\n\n        for i, sen in enumerate(senate):\n            if sen == 'R':\n                r.append(i)\n            elif sen == 'D':\n                d.append(i)\n        \n        while r and d:\n            r_idx = r.popleft()\n            d_idx = d.popleft()\n\n            if r_idx < d_idx:       # r won this round\n                r.append(r_idx + n)\n            else:                   # d won this round\n                d.append(d_idx + n)\n        \n        return 'Radiant' if r else 'Dire'",
+            "timestamp": 1780319660
+        }
+    ],
+    "2248": [
+        {
+            "title": "Minimum Cost of Buying Candies With Discount",
+            "title_slug": "minimum-cost-of-buying-candies-with-discount",
+            "lang": "python3",
+            "runtime": "0 ms",
+            "memory": "19.2 MB",
+            "code": "class Solution:\n    def minimumCost(self, cost: List[int]) -> int:\n        if len(cost) == 1:\n            return cost[0]\n        if len(cost) == 2:\n            return cost[0] + cost[1]\n        \n        cost.sort(reverse=True)\n        count = 2\n        ret = 0\n        for i, c in enumerate(cost):\n            if count:\n                ret += c\n                count -= 1\n            else:\n                count = 2\n                continue\n        \n        return ret",
+            "timestamp": 1780288622
+        }
+    ],
+    "1422": [
+        {
+            "title": "Divide Array in Sets of K Consecutive Numbers",
+            "title_slug": "divide-array-in-sets-of-k-consecutive-numbers",
+            "lang": "python3",
+            "runtime": "128 ms",
+            "memory": "37.4 MB",
+            "code": "class Solution:\n    def isPossibleDivide(self, nums: List[int], k: int) -> bool:\n        if len(nums) % k != 0:\n            return False\n\n        hashset = Counter(nums)\n\n        for num in nums:\n            start_set = num\n\n            # Find potential start of set \n            while hashset[start_set - 1]:\n                start_set -= 1\n            \n            while start_set <= num:\n                while hashset[start_set]:\n                    for next_card in range(start_set, start_set + k):\n                        if not hashset[next_card]:\n                            return False\n                        hashset[next_card] -= 1\n                start_set += 1\n        \n        return True",
+            "timestamp": 1780134910
+        }
+    ],
+    "3606": [
+        {
+            "title": "Minimum Element After Replacement With Digit Sum",
+            "title_slug": "minimum-element-after-replacement-with-digit-sum",
+            "lang": "python3",
+            "runtime": "8 ms",
+            "memory": "19.4 MB",
+            "code": "class Solution:\n    def minElement(self, nums: List[int]) -> int:\n        ret = float('inf')\n\n        for num in nums:\n            num_sum = 0\n            x = num\n            while x:\n                num_sum += x % 10\n                x = x // 10\n            ret = min(ret, num_sum)\n        \n        return ret",
+            "timestamp": 1780069276
+        }
+    ],
+    "3376": [
+        {
+            "title": "Longest Common Suffix Queries",
+            "title_slug": "longest-common-suffix-queries",
+            "lang": "python3",
+            "runtime": "2251 ms",
+            "memory": "180.5 MB",
+            "code": "class TrieNode:\n    def __init__(self):\n        self.children = {}\n        # Index of shortest inserted string passing thru this node\n        self.index = float('inf')\n        self.min_len = float('inf')\n\nclass Trie:\n    def __init__(self):\n        self.root = TrieNode()\n    \n    def insert(self, word: str, index: int):\n        curr = self.root\n        if len(word) < curr.min_len:\n            curr.min_len = len(word)\n            curr.index = index\n\n        # Word has been pre-reversed\n        for ch in word:\n            if ch not in curr.children:\n                curr.children[ch] = TrieNode()\n            curr = curr.children[ch]\n\n            if len(word) < curr.min_len:\n                curr.min_len = len(word)\n                curr.index = index\n\n    def query(self, word: str) -> int:\n        curr = self.root\n        \n        for ch in word:\n            if ch in curr.children:\n                curr = curr.children[ch]\n            else:\n                break\n        \n        return curr.index\n\n\nclass Solution:\n    def stringIndices(self, wordsContainer: List[str], wordsQuery: List[str]) -> List[int]:\n        trie = Trie()\n\n        # Build trie using reversed words\n        for i, word in enumerate(wordsContainer):\n            rev_word = word[::-1]\n            trie.insert(rev_word, i)\n        \n        ret = []\n        for query in wordsQuery:\n            rev_q = query[::-1] # Reverse query\n            ret.append(trie.query(rev_q))\n\n        return ret",
+            "timestamp": 1779969554
+        }
+    ],
+    "3405": [
+        {
+            "title": "Count the Number of Special Characters II",
+            "title_slug": "count-the-number-of-special-characters-ii",
+            "lang": "python3",
+            "runtime": "214 ms",
+            "memory": "21.4 MB",
+            "code": "class Solution:\n    def numberOfSpecialChars(self, word: str) -> int:\n        # Record first occurence of Uppercase\n        # Record last occurence of Lowercase\n        # If both exist and last_occ_lower < first_occ_upper, count += 1\n\n        last_lower = {}\n        first_upper = {}\n\n        for i, char in enumerate(word):\n            if char.islower():\n                last_lower[char] = i\n            else:\n                if char not in first_upper:\n                    first_upper[char] = i\n        \n        count = 0\n\n        for char in string.ascii_lowercase:\n            if char in last_lower and \\\n                char.upper() in first_upper and \\\n                last_lower[char] < first_upper[char.upper()]:\n                count += 1\n        \n        return count",
+            "timestamp": 1779882474
+        }
+    ],
+    "3408": [
+        {
+            "title": "Count the Number of Special Characters I",
+            "title_slug": "count-the-number-of-special-characters-i",
+            "lang": "python3",
+            "runtime": "0 ms",
+            "memory": "19.2 MB",
+            "code": "class Solution:\n    def numberOfSpecialChars(self, word: str) -> int:\n        hashset = set(word)\n        count = 0\n        \n        for i in range(26):\n            lwr = chr(ord('a') + i)\n            upr = chr(ord('A') + i)\n\n            if lwr in hashset and upr in hashset:\n                count += 1\n\n        return count",
+            "timestamp": 1779785289
+        }
+    ],
+    "1878": [
+        {
+            "title": "Check if Array Is Sorted and Rotated",
+            "title_slug": "check-if-array-is-sorted-and-rotated",
+            "lang": "python3",
+            "runtime": "0 ms",
+            "memory": "19.2 MB",
+            "code": "class Solution:\n    def check(self, nums: List[int]) -> bool:\n        if len(nums) == 1:\n            return True\n        \n        flag = 0\n        n = len(nums)\n\n        for i in range(1, n):\n            if nums[i] < nums[i - 1]:   # First index where i < i-1\n                for j in range(i, n - 1):   # Non-decr from here\n                    if nums[j] > nums[j + 1]:\n                        return False\n                \n                return nums[n - 1] <= nums[0]\n        \n        return True",
+            "timestamp": 1779737739
+        }
+    ],
+    "2001": [
+        {
+            "title": "Jump Game VII",
+            "title_slug": "jump-game-vii",
+            "lang": "python3",
+            "runtime": "133 ms",
+            "memory": "20.5 MB",
+            "code": "class Solution:\n    def canReach(self, s: str, minJump: int, maxJump: int) -> bool:\n        if s[-1] != '0':\n            return False\n        \n        n = len(s)\n\n        dp = [False] * n\n        dp[0] = True\n\n        reachable = 0\n\n        for i in range(1, n):\n            if i >= minJump and dp[i - minJump]:\n                reachable += 1\n            \n            if i > maxJump and dp[i - maxJump - 1]:\n                reachable -= 1\n            \n            if reachable > 0 and s[i] == '0':\n                dp[i] = True\n        \n        return dp[-1]",
+            "timestamp": 1779737360
+        }
+    ],
+    "1020": [
+        {
+            "title": "Longest Turbulent Subarray",
+            "title_slug": "longest-turbulent-subarray",
+            "lang": "python3",
+            "runtime": "60 ms",
+            "memory": "23.2 MB",
+            "code": "class Solution:\n    def maxTurbulenceSize(self, arr: List[int]) -> int:\n        if len(arr) == 1:\n            return 1\n        \n        n = len(arr)\n        ret = 1\n        left = 0\n\n        def compare(x: int, y: int) -> int:\n            if x < y:\n                return -1\n            if x > y:\n                return 1\n            return 0\n        \n        for i in range(1, n):\n            c = compare(arr[i - 1], arr[i])\n\n            if c == 0:\n                left = i\n            else:\n                if i == n - 1 or \\\n                    c * compare(arr[i], arr[i + 1]) != -1:\n                    ret = max(ret, i - left + 1)\n                    left = i\n        \n        return ret",
+            "timestamp": 1779451036
+        }
+    ],
+    "954": [
+        {
+            "title": "Maximum Sum Circular Subarray",
+            "title_slug": "maximum-sum-circular-subarray",
+            "lang": "python3",
+            "runtime": "38 ms",
+            "memory": "24.2 MB",
+            "code": "class Solution:\n    def maxSubarraySumCircular(self, nums: List[int]) -> int:\n        if len(nums) == 1:\n            return nums[0]\n        \n        currmax, currmin = 0, 0\n        globmax, globmin = nums[0], nums[0]\n        total = 0\n\n        for num in nums:\n            currmax = max(currmax + num, num)\n            currmin = min(currmin + num, num)\n\n            total += num\n\n            globmax = max(globmax, currmax)\n            globmin = min(globmin, currmin)\n        \n        return max(globmax, total - globmin) if globmax > 0 else globmax",
+            "timestamp": 1779370311
+        }
+    ],
+    "3329": [
+        {
+            "title": "Find the Length of the Longest Common Prefix",
+            "title_slug": "find-the-length-of-the-longest-common-prefix",
+            "lang": "python3",
+            "runtime": "350 ms",
+            "memory": "36.5 MB",
+            "code": "class TrieNode:\n    def __init__(self):\n        self.children = {}\n\nclass Trie:\n    def __init__(self):\n        self.root = TrieNode()\n    \n    def insert(self, num) -> None:\n        node = self.root\n        for digit in str(num):\n            if digit not in node.children:\n                node.children[digit] = TrieNode()\n            node = node.children[digit]\n    \n    def findLongestPrefix(self, num) -> int:\n        l = 0\n        node = self.root\n\n        for digit in str(num):\n            if digit in node.children:\n                l += 1\n                node = node.children[digit]\n                continue\n            break\n        \n        return l\n\nclass Solution:\n    def longestCommonPrefix(self, arr1: List[int], arr2: List[int]) -> int:\n        trie = Trie()\n\n        for num in arr1:\n            trie.insert(num)\n        \n        ret = 0     # Longest Prefix -> return value\n\n        for num in arr2:\n            l = trie.findLongestPrefix(num)\n            ret = max(ret, l)\n        \n        return ret",
+            "timestamp": 1779362636
+        },
+        {
+            "title": "Find the Length of the Longest Common Prefix",
+            "title_slug": "find-the-length-of-the-longest-common-prefix",
+            "lang": "python3",
+            "runtime": "183 ms",
+            "memory": "30 MB",
+            "code": "class Solution:\n    def longestCommonPrefix(self, arr1: List[int], arr2: List[int]) -> int:\n        prefixes = set()\n\n        # Add all prefixes of all numbers from arr1 into a set\n        for num in arr1:\n            x = num\n            while x > 0:\n                prefixes.add(x)\n                x = x // 10\n        \n        ret = 0\n\n        for num in arr2:\n            y = num\n            while y > 0:\n                if y in prefixes:\n                    l = len(str(y))\n                    ret = max(ret, l)\n                    break\n                y = y // 10\n        \n        return ret",
+            "timestamp": 1779362995
+        }
+    ],
+    "890": [
+        {
+            "title": "Lemonade Change",
+            "title_slug": "lemonade-change",
+            "lang": "python3",
+            "runtime": "9 ms",
+            "memory": "23.4 MB",
+            "code": "class Solution:\n    def lemonadeChange(self, bills: List[int]) -> bool:\n        bill_collection = {}  # {Bill : frequency}\n        cost = 5\n\n        def changeAvailable(rem) -> bool:\n            if rem == 5:\n                if 5 in bill_collection and bill_collection[5] != 0:\n                    bill_collection[5] -= 1\n                    return True\n            if rem == 15:\n                if 10 in bill_collection and bill_collection[10] >= 1 and 5 in bill_collection and bill_collection[5] >= 1:\n                    bill_collection[10] -= 1\n                    bill_collection[5] -= 1\n                    return True\n                elif 5 in bill_collection and bill_collection[5] >= 3:\n                    bill_collection[5] -= 3\n                    return True\n            \n            return False\n\n        for bill in bills:\n            bill_collection[bill] = bill_collection.get(bill, 0) + 1 \n            rem = bill - cost\n            if not rem:\n                continue\n            \n            if not changeAvailable(rem):\n                return False\n\n        return True",
+            "timestamp": 1779191966
+        }
+    ],
+    "2634": [
+        {
+            "title": "Minimum Common Value",
+            "title_slug": "minimum-common-value",
+            "lang": "python3",
+            "runtime": "3 ms",
+            "memory": "37.8 MB",
+            "code": "class Solution:\n    def getCommon(self, nums1: List[int], nums2: List[int]) -> int:\n        i, j = 0, 0     # Pointers for nums1, nums2\n        m, n = len(nums1), len(nums2)\n        \n        while i < m and j < n:\n            if nums1[i] < nums2[j]:\n                i += 1\n            elif nums1[i] > nums2[j]:\n                j += 1\n            else:\n                return nums1[i]\n        \n        return -1",
+            "timestamp": 1779191008
+        }
+    ],
+    "1522": [
+        {
+            "title": "Stone Game III",
+            "title_slug": "stone-game-iii",
+            "lang": "python3",
+            "runtime": "1692 ms",
+            "memory": "169.3 MB",
+            "code": "class Solution:\n    def stoneGameIII(self, stoneValue: List[int]) -> str:\n        dp = {}\n\n        # Returns (alice-bob) OR (bob-alice) -> based on turn\n        def dfs(i) -> int:\n            if i == len(stoneValue):\n                return 0\n            if i in dp:\n                return dp[i]\n            \n            ret = float(\"-inf\")\n            for j in range(i, min(i + 3, len(stoneValue))):\n                ret = max(ret, sum(stoneValue[i:j+1]) - dfs(j + 1))\n            \n            dp[i] = ret\n            return ret\n        \n        return \"Alice\" if dfs(0) > 0 else (\"Bob\" if dfs(0) < 0 else \"Tie\")",
+            "timestamp": 1779084675
+        }
+    ],
+    "154": [
+        {
+            "title": "Find Minimum in Rotated Sorted Array II",
+            "title_slug": "find-minimum-in-rotated-sorted-array-ii",
+            "lang": "python3",
+            "runtime": "0 ms",
+            "memory": "19.4 MB",
+            "code": "class Solution:\n    def findMin(self, nums: List[int]) -> int:\n        n = len(nums)\n        if n == 1:\n            return nums[0]\n        \n        l = 0\n        r = n - 1\n        ret = nums[l]\n\n        while l <= r:\n            m = (l + r) // 2\n            \n            if nums[m] < nums[r]:\n                r = m\n            elif nums[m] > nums[r]:\n                l = m + 1\n            else:   # duplicates\n                r -= 1\n        \n        return nums[l]",
+            "timestamp": 1778930336
+        }
+    ],
+    "1784": [
+        {
+            "title": "Minimum Initial Energy to Finish Tasks",
+            "title_slug": "minimum-initial-energy-to-finish-tasks",
+            "lang": "python3",
+            "runtime": "54 ms",
+            "memory": "55.6 MB",
+            "code": "class Solution:\n    def minimumEffort(self, tasks: List[List[int]]) -> int:\n        tasks.sort(key=lambda x: x[1] - x[0], reverse=True)\n        start = tasks[0][1]\n        bal = tasks[0][1] - tasks[0][0]\n        loan = 0\n\n        for i in range(1, len(tasks)):\n            cost, thresh = tasks[i]\n\n            if bal < thresh:\n                loan += thresh - bal\n                bal = thresh\n            \n            bal -= cost\n        \n        return start + loan",
+            "timestamp": 1778870374
+        }
+    ],
+    "343": [
+        {
+            "title": "Integer Break",
+            "title_slug": "integer-break",
+            "lang": "python3",
+            "runtime": "3 ms",
+            "memory": "19.4 MB",
+            "code": "class Solution:\n    def integerBreak(self, n: int) -> int:\n        memo = {}\n\n        def recur(k):\n            if k in memo:\n                return memo[k]\n            if k == 1:\n                return 1\n            ret = -float('inf')\n            for i in range(1, k):\n                ret = max(ret, i * recur(k - i), i * (k - i))\n            \n            memo[k] = ret\n            return ret\n        \n        return recur(n)",
+            "timestamp": 1778800281
+        }
+    ],
+    "2550": [
+        {
+            "title": "Words Within Two Edits of Dictionary",
+            "title_slug": "words-within-two-edits-of-dictionary",
+            "lang": "python3",
+            "runtime": "27 ms",
+            "memory": "22.2 MB",
+            "code": "class TrieNode:\n    def __init__(self) -> None:\n        self.children = {}\n        self.isEnd = False\n\nclass Trie:\n    def __init__(self) -> None:\n        self.root = TrieNode()\n    \n    def insert(self, word) -> None:\n        curr = self.root\n\n        for char in word:\n            if char not in curr.children:\n                curr.children[char] = TrieNode()\n            curr = curr.children[char]\n        \n        curr.isEnd = True\n\n    def checkQuery(self, word, i, node, count) -> bool:\n        # DFS\n        if count > 2 or not node:\n            return False\n        \n        if i == len(word):\n            return node.isEnd\n        \n        # No changes made\n        if word[i] in node.children and self.checkQuery(word, i + 1, node.children[word[i]], count):\n            return True\n        \n        # Changes made\n        if count < 2:\n            for next_char, child_node in node.children.items():\n                # We only want to explore paths that require a change \n                if next_char != word[i]:\n                    # Recurse, incrementing the edit count\n                    if self.checkQuery(word, i + 1, child_node, count + 1):\n                        return True\n                        \n        return False        \n\nclass Solution:\n    def twoEditWords(self, queries: List[str], dictionary: List[str]) -> List[str]:\n        ret = []\n        dictionary = set(dictionary)\n        trie = Trie()\n\n        # Build Trie from dictionary\n        for word in dictionary:\n            trie.insert(word)\n        \n        # Iterate over queries\n        for query in queries:\n            if query in dictionary:\n                ret.append(query)\n                continue\n\n            # Check for query in Trie\n            if trie.checkQuery(query, 0, trie.root, 0):\n                ret.append(query)\n            \n        return ret",
+            "timestamp": 1778677769
+        }
+    ],
+    "279": [
+        {
+            "title": "Perfect Squares",
+            "title_slug": "perfect-squares",
+            "lang": "python3",
+            "runtime": "3776 ms",
+            "memory": "53.3 MB",
+            "code": "class Solution:\n    def numSquares(self, n: int) -> int:\n        memo = {}\n\n        def recur(rem) -> int:\n            if rem == 0:\n                return 0\n            if rem < 0:\n                return float('inf')\n            \n            if rem in memo:\n                return memo[rem]\n            \n            min_sq = float('inf')\n\n            for i in range(1, math.isqrt(rem) + 1):\n                sq = i ** 2\n                # 1 count + count of remaining\n                count = 1 + recur(rem - sq)\n                # Keep track of min count\n                min_sq = min(min_sq, count)\n            \n            memo[rem] = min_sq\n            return min_sq\n    \n        return recur(n)",
+            "timestamp": 1778617524
+        },
+        {
+            "title": "Perfect Squares",
+            "title_slug": "perfect-squares",
+            "lang": "python3",
+            "runtime": "2037 ms",
+            "memory": "19.2 MB",
+            "code": "class Solution:\n    def numSquares(self, n: int) -> int:\n        dp = [float('inf')] * (n + 1)\n        dp[0] = 0\n\n        for i in range(1, n + 1):\n            j = 1\n            while j ** 2 <= i:\n                dp[i] = min(dp[i], dp[i - j ** 2] + 1)\n                j += 1\n        \n        return dp[n]",
+            "timestamp": 1778617884
+        }
+    ],
+    "3019": [
+        {
+            "title": "Furthest Point From Origin",
+            "title_slug": "furthest-point-from-origin",
+            "lang": "python3",
+            "runtime": "0 ms",
+            "memory": "19.3 MB",
+            "code": "class Solution:\n    def furthestDistanceFromOrigin(self, moves: str) -> int:\n        ret = 0\n        temp = 0\n        for move in moves:\n            if move == 'L':\n                ret -= 1\n            elif move == 'R':\n                ret += 1\n            elif move == '_':\n                temp += 1\n        \n        return abs(ret) + temp",
+            "timestamp": 1778165102
+        }
+    ],
+    "804": [
+        {
+            "title": "Rotated Digits",
+            "title_slug": "rotated-digits",
+            "lang": "python3",
+            "runtime": "23 ms",
+            "memory": "19.3 MB",
+            "code": "class Solution:\n    def rotatedDigits(self, n: int) -> int:\n        if n == 1:\n            return 0\n        \n        count = 0\n        \n        for i in range(1, n + 1):\n            num = i\n            isValid = True  # If number is valid\n            hasChange = False   # If it changes after rotation\n\n            while num > 0:\n                digit = num % 10\n\n                if digit in (3, 4, 7):\n                    isValid = False\n                    break\n                \n                if digit in (2, 5, 6, 9):\n                    hasChange = True\n                \n                num = num // 10\n            \n            if isValid and hasChange:\n                count += 1\n            \n        return count",
+            "timestamp": 1777760476
+        }
+    ],
+    "377": [
+        {
+            "title": "Combination Sum IV",
+            "title_slug": "combination-sum-iv",
+            "lang": "python3",
+            "runtime": "50 ms",
+            "memory": "19.3 MB",
+            "code": "class Solution:\n    def combinationSum4(self, nums: List[int], target: int) -> int:\n        dp = [0] * (target + 1)\n        dp[0] = 1\n        \n        for i in range(1, target + 1):\n            for num in nums:\n                if i - num >= 0:\n                    dp[i] += dp[i - num]\n                    \n        return dp[target]",
+            "timestamp": 1777156198
+        },
+        {
+            "title": "Combination Sum IV",
+            "title_slug": "combination-sum-iv",
+            "lang": "python3",
+            "runtime": "41 ms",
+            "memory": "19.4 MB",
+            "code": "class Solution:\n    def combinationSum4(self, nums: List[int], target: int) -> int:\n        #dp = [0] * (target + 1) # Num ways in which we can reach target sums\n        nums.sort()\n        memo = {}\n\n        def recur(n):\n            if n in memo:\n                return memo[n]\n            if n == 0:\n                return 1\n            if n < nums[0]:\n                return 0\n            \n            count = 0\n            for num in nums:\n                if n - num < 0:\n                    break\n                count += recur(n - num)\n            \n            memo[n] = count\n            return count\n        \n        return recur(target)",
+            "timestamp": 1777759004
+        }
+    ],
+    "396": [
+        {
+            "title": "Rotate Function",
+            "title_slug": "rotate-function",
+            "lang": "python3",
+            "runtime": "142 ms",
+            "memory": "31.1 MB",
+            "code": "class Solution:\n    def maxRotateFunction(self, nums: List[int]) -> int:\n        n = len(nums)\n        \n        total_sum = 0\n        F = 0\n        \n        for i in range(n):\n            total_sum += nums[i]\n            F += i * nums[i]\n        \n        result = F\n        \n        for k in range(1, n):\n            F = F + total_sum - n * nums[n - k]\n            result = max(result, F)\n        \n        return result",
+            "timestamp": 1777665216
+        }
+    ],
+    "3986": [
+        {
+            "title": "Maximum Path Score in a Grid",
+            "title_slug": "maximum-path-score-in-a-grid",
+            "lang": "python3",
+            "runtime": "7373 ms",
+            "memory": "37.4 MB",
+            "code": "class Solution:\n    def maxPathScore(self, grid: List[List[int]], k: int) -> int:\n        ROWS, COLS = len(grid), len(grid[0])\n        \n        INF = float(\"-inf\")\n        dp = [[[INF] * (k + 1) for _ in range(COLS)] for _ in range(ROWS)]\n        \n        dp[0][0][0] = 0\n\n        for i in range(ROWS):\n            for j in range(COLS):\n                for c in range(k + 1):\n                    if dp[i][j][c] == INF:\n                        continue\n                    \n                    if i + 1 < ROWS:\n                        val = grid[i + 1][j]\n                        cost = 0 if val == 0 else 1\n                        if c + cost <= k:\n                            dp[i + 1][j][c + cost] = max(\n                                dp[i + 1][j][c + cost], dp[i][j][c] + val\n                            )\n                    \n                    if j + 1 < COLS:\n                        val = grid[i][j + 1]\n                        cost = 0 if val == 0 else 1\n                        if c + cost <= k:\n                            dp[i][j + 1][c + cost] = max(\n                                dp[i][j + 1][c + cost], dp[i][j][c] + val\n                            )\n        \n        ret = max(dp[ROWS - 1][COLS - 1])\n        return -1 if ret < 0 else ret",
+            "timestamp": 1777509837
+        }
+    ],
+    "2160": [
+        {
+            "title": "Minimum Operations to Make a Uni-Value Grid",
+            "title_slug": "minimum-operations-to-make-a-uni-value-grid",
+            "lang": "python3",
+            "runtime": "163 ms",
+            "memory": "40.8 MB",
+            "code": "class Solution:\n    def minOperations(self, grid: List[List[int]], x: int) -> int:\n        nums = []\n        ret = 0\n\n        for row in grid:\n            for n in row:\n                nums.append(n)\n\n        # Need to find median\n        nums.sort()\n        n = len(nums)\n\n        median = nums[n // 2]\n\n        for num in nums:\n            # If remainder when dividing by x is different, return -1\n            if num % x != median % x:\n                return -1\n            \n            # Number of operations required to make (curr_num == median)\n            ret += abs(median - num) // x\n        \n        return ret",
+            "timestamp": 1777416151
+        }
+    ],
+    "1663": [
+        {
+            "title": "Detect Cycles in 2D Grid",
+            "title_slug": "detect-cycles-in-2d-grid",
+            "lang": "python3",
+            "runtime": "419 ms",
+            "memory": "121.5 MB",
+            "code": "class Solution:\n    def containsCycle(self, grid: List[List[str]]) -> bool:\n        ROWS, COLS = len(grid), len(grid[0])\n        visited = set()\n        dirs = ((0, -1), (0, 1), (-1, 0), (1, 0))\n        \n        def dfs(r: int, c: int, pr: int, pc: int):\n            visited.add((r, c))\n\n            for dr, dc in dirs:\n                nr, nc = r + dr, c + dc\n\n                if (nr, nc) != (pr, pc):\n                    if 0 <= nr < ROWS and 0 <= nc < COLS:\n                        if grid[nr][nc] == grid[r][c]:\n                            if (nr, nc) in visited or dfs(nr, nc, r, c):\n                                return True\n            \n            return False\n        \n        for i in range(ROWS):\n            for j in range(COLS):\n                if (i, j) not in visited and dfs(i, j, -1, -1):\n                    return True\n        \n        return False",
+            "timestamp": 1777247014
+        },
+        {
+            "title": "Detect Cycles in 2D Grid",
+            "title_slug": "detect-cycles-in-2d-grid",
+            "lang": "python3",
+            "runtime": "447 ms",
+            "memory": "145.8 MB",
+            "code": "class Solution:\n    def containsCycle(self, grid: List[List[str]]) -> bool:\n        ROWS, COLS = len(grid), len(grid[0])\n        visited = set()\n        \n        def dfs(r: int, c: int, pr: int, pc: int):\n            if r < 0 or r == ROWS or c < 0 or c == COLS:\n                return False\n            \n            if pr != -1 and grid[r][c] != grid[pr][pc]:\n                return False\n            \n            if (r, c) in visited:\n                return True\n\n            visited.add((r, c))\n\n            ret = (\n                ((r + 1, c) != (pr, pc) and dfs(r + 1, c, r, c)) or\n                ((r - 1, c) != (pr, pc) and dfs(r - 1, c, r, c)) or\n                ((r, c + 1) != (pr, pc) and dfs(r, c + 1, r, c)) or\n                ((r, c - 1) != (pr, pc) and dfs(r, c - 1, r, c))\n            )\n            \n            return ret\n        \n        for i in range(ROWS):\n            for j in range(COLS):\n                if (i, j) not in visited and dfs(i, j, -1, -1):\n                    return True\n        \n        return False",
+            "timestamp": 1777250377
+        }
+    ],
+    "2721": [
+        {
+            "title": "Sum of Distances",
+            "title_slug": "sum-of-distances",
+            "lang": "python3",
+            "runtime": "122 ms",
+            "memory": "54.9 MB",
+            "code": "class Solution:\n    def distance(self, nums: List[int]) -> List[int]:\n        hashmap = defaultdict(list)    # value:[indices]\n        for i, num in enumerate(nums):\n            hashmap[num].append(i)\n        \n        ret = [0] * len(nums)\n        \n        for val in hashmap.values():\n            total = sum(val)\n            l_sum = 0\n            m = len(val)\n\n            for i in range(m):\n                r_sum = total - l_sum - val[i]\n\n                left = val[i] * i - l_sum\n                right = r_sum - val[i] * (m - i - 1)\n\n                ret[val[i]] = left + right\n\n                l_sum += val[i]\n            \n        return ret",
+            "timestamp": 1777058197
         }
     ]
 }
