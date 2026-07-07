@@ -39,7 +39,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.SYNC_GITHUB_TOKEN }}
           GITHUB_ID: ${{ secrets.GH_ID }}
         # Runs the scraper pointing to your target repo
-        run: python historical-scraper/main.py --repo Github-Submissions
+        run: python historical-scraper/main.py --repo Leetcode-Submissions
       - name: Commit and Push Cache Updates
         run: |
           git add historical-scraper/data/

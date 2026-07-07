@@ -106,7 +106,7 @@ A pre-configured GitHub Action that runs daily to scan your profile for new subm
    ```
 5. Run the orchestrator:
    ```bash
-   python main.py --repo Github-Submissions
+   python main.py --repo Leetcode-Submissions
    ```
 
 ### Daily GitHub Actions Sync
