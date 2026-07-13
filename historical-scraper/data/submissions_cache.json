@@ -5861,6 +5861,15 @@
             "memory": "75 MB",
             "code": "class Solution:\n    def minScore(self, n: int, roads: List[List[int]]) -> int:\n        adj = defaultdict(list)\n\n        for u, v, d in roads:\n            adj[u].append((v, d))\n            adj[v].append((u, d))\n        \n        visited = set()\n        dq = deque([1])\n\n        ret = float('inf')\n\n        while dq:\n            u = dq.popleft()\n\n            for v, d in adj[u]:\n                ret = min(ret, d)\n\n                if v not in visited:\n                    visited.add(v)\n                    dq.append(v)\n        \n        return ret",
             "timestamp": 1783154663
+        },
+        {
+            "title": "Minimum Score of a Path Between Two Cities",
+            "title_slug": "minimum-score-of-a-path-between-two-cities",
+            "lang": "python3",
+            "runtime": "171 ms",
+            "memory": "101.7 MB",
+            "code": "class Solution:\n    def minScore(self, n: int, roads: List[List[int]]) -> int:\n        adj = defaultdict(list)\n\n        for u, v, d in roads:\n            adj[u].append((v, d))\n            adj[v].append((u, d))\n        \n        visited = set()\n        ret = float('inf')\n        \n        def dfs(node) -> None:\n            visited.add(node)\n            \n            nonlocal ret\n            for nb, wt in adj[node]:\n                ret = min(ret, wt)\n                if nb not in visited:\n                    dfs(nb)\n        \n        dfs(1)\n        return ret",
+            "timestamp": 1783668840
         }
     ],
     "1240": [
@@ -6637,6 +6646,57 @@
             "memory": "54.9 MB",
             "code": "class Solution:\n    def distance(self, nums: List[int]) -> List[int]:\n        hashmap = defaultdict(list)    # value:[indices]\n        for i, num in enumerate(nums):\n            hashmap[num].append(i)\n        \n        ret = [0] * len(nums)\n        \n        for val in hashmap.values():\n            total = sum(val)\n            l_sum = 0\n            m = len(val)\n\n            for i in range(m):\n                r_sum = total - l_sum - val[i]\n\n                left = val[i] * i - l_sum\n                right = r_sum - val[i] * (m - i - 1)\n\n                ret[val[i]] = left + right\n\n                l_sum += val[i]\n            \n        return ret",
             "timestamp": 1777058197
+        }
+    ],
+    "1212": [
+        {
+            "title": "Sequential Digits",
+            "title_slug": "sequential-digits",
+            "lang": "python3",
+            "runtime": "0 ms",
+            "memory": "19.2 MB",
+            "code": "class Solution:\n    def sequentialDigits(self, low: int, high: int) -> List[int]:\n        ret = []\n        for i in range(1, 10):\n            num = i\n            for j in range(i + 1, 10):\n                num = num * 10 + j\n                if low <= num <= high:\n                    ret.append(num)\n        \n        ret.sort()\n        return ret",
+            "timestamp": 1783976108
+        }
+    ],
+    "115": [
+        {
+            "title": "Distinct Subsequences",
+            "title_slug": "distinct-subsequences",
+            "lang": "python3",
+            "runtime": "19 ms",
+            "memory": "44 MB",
+            "code": "class Solution:\n    def numDistinct(self, s: str, t: str) -> int:\n        if len(t) > len(s):\n            return 0\n        n, m = len(s), len(t)\n        dp = [[-1] * (m + 1) for _ in range(n + 1)]     # (i, j): count\n\n        def recur(i: int, j: int) -> int:\n            # if s2 exhausted - matched SUCCESSFULLY\n            if j >= m:\n                return 1\n            \n            # if s1 exhausted but s2 is not\n            # Cannot be matched\n            if i >= n:\n                return 0\n\n            # len(remaining substr of s) < len(remaining substr of t)\n            # Cannot be matched\n            if n - i < m - j:\n                return 0\n            \n            # Memoization\n            if dp[i][j] != -1:\n                return dp[i][j]\n            \n            ret = 0\n\n            # If characters at i and j match\n            if s[i] == t[j]:\n                # Choose matching character from s1\n                # or \n                # ignore character in s1 and move to next\n                ret = recur(i + 1, j + 1) \\\n                        + \\\n                        recur(i + 1, j)\n            else:\n                # Skip current char in s1 and move to next\n                ret = recur(i + 1, j)\n            \n            dp[i][j] = ret\n            return ret\n        \n        return recur(0, 0)",
+            "timestamp": 1783431133
+        },
+        {
+            "title": "Distinct Subsequences",
+            "title_slug": "distinct-subsequences",
+            "lang": "python3",
+            "runtime": "440 ms",
+            "memory": "75.4 MB",
+            "code": "class Solution:\n    def numDistinct(self, s: str, t: str) -> int:\n        if len(t) > len(s):\n            return 0\n        n, m = len(s), len(t)\n        dp = [[0] * (m + 1) for _ in range(n + 1)]     # (i, j): count\n\n        for i in range(n + 1):\n            dp[i][m] = 1\n\n        for i in range(n - 1, -1, -1):\n            for j in range(m - 1, -1, -1):\n                dp[i][j] = dp[i + 1][j]\n\n                if s[i] == t[j]:\n                    dp[i][j] += dp[i + 1][j + 1]\n        \n        return dp[0][0]",
+            "timestamp": 1783594231
+        },
+        {
+            "title": "Distinct Subsequences",
+            "title_slug": "distinct-subsequences",
+            "lang": "python3",
+            "runtime": "445 ms",
+            "memory": "75.6 MB",
+            "code": "class Solution:\n    def numDistinct(self, s: str, t: str) -> int:\n        dp = [[0] * (len(t) + 1) for _ in range(len(s) + 1)]\n\n        for i in range(0, len(s) + 1):\n            dp[i][0] = 1                # base case: for empty target t, there is only one way: ignore the char in s\n        \n        for i in range(1, len(s) + 1):\n            for j in range(1, len(t) + 1):\n\n                s_char = s[i - 1]\n                t_char = t[j - 1]\n\n                if s_char != t_char:\n                    dp[i][j] = dp[i - 1][j]\n                else:\n                    dp[i][j] =  dp[i - 1][j] + dp[i - 1][j - 1] # skip current s char, or use current s char\n\n        return dp[len(s)][len(t)]",
+            "timestamp": 1783594315
+        }
+    ],
+    "4135": [
+        {
+            "title": "Concatenate Non-Zero Digits and Multiply by Sum I",
+            "title_slug": "concatenate-non-zero-digits-and-multiply-by-sum-i",
+            "lang": "python3",
+            "runtime": "1 ms",
+            "memory": "19.4 MB",
+            "code": "class Solution:\n    def sumAndMultiply(self, n: int) -> int:\n        x = \"\"\n        sum_digits = 0\n\n        for digit in str(n):\n            if digit != '0':\n                x += digit\n                sum_digits += int(digit)\n\n        return int(x) * sum_digits if sum_digits else 0",
+            "timestamp": 1783428391
         }
     ]
 }
