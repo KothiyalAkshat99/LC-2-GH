@@ -6698,5 +6698,25 @@
             "code": "class Solution:\n    def sumAndMultiply(self, n: int) -> int:\n        x = \"\"\n        sum_digits = 0\n\n        for digit in str(n):\n            if digit != '0':\n                x += digit\n                sum_digits += int(digit)\n\n        return int(x) * sum_digits if sum_digits else 0",
             "timestamp": 1783428391
         }
+    ],
+    "72": [
+        {
+            "title": "Edit Distance",
+            "title_slug": "edit-distance",
+            "lang": "python3",
+            "runtime": "41 ms",
+            "memory": "24.3 MB",
+            "code": "class Solution:\n    def minDistance(self, word1: str, word2: str) -> int:\n        if not word1 and not word2:\n            return 0\n        \n        memo = {}\n        \n        def recur(idx1: int, idx2: int) -> int:\n            # Base Case - end of both words reached\n            if idx1 == len(word1) and idx2 == len(word2):\n                return 0\n            # When only one word ends, #ops = remaining length of other word\n            if idx1 == len(word1):\n                return len(word2) - idx2\n            if idx2 == len(word2):\n                return len(word1) - idx1\n            \n            # Solution in Cache\n            if (idx1, idx2) in memo:\n                return memo[(idx1, idx2)]\n            \n            if word1[idx1] == word2[idx2]:\n                ret = recur(idx1 + 1, idx2 + 1)\n            else:\n                insert = 1 + recur(idx1, idx2 + 1)\n                delete = 1 + recur(idx1 + 1, idx2)\n                replace = 1 + recur(idx1 + 1, idx2 + 1)\n                ret = min(insert, delete, replace)\n            \n            memo[(idx1, idx2)] = ret\n            return ret\n        \n        return recur(0, 0)",
+            "timestamp": 1784023392
+        },
+        {
+            "title": "Edit Distance",
+            "title_slug": "edit-distance",
+            "lang": "python3",
+            "runtime": "44 ms",
+            "memory": "22.6 MB",
+            "code": "class Solution:\n    def minDistance(self, word1: str, word2: str) -> int:\n        if not word1 and not word2:\n            return 0\n\n        len1 = len(word1)\n        len2 = len(word2)\n        dp = [[0] * (len2 + 1) for _ in range(len1 + 1)]\n\n        for idx1 in range(len1 + 1):\n            dp[idx1][0] = idx1\n        \n        for idx2 in range(len2 + 1):\n            dp[0][idx2] = idx2\n        \n        for idx1 in range(1, len1 + 1):\n            for idx2 in range(1, len2 + 1):\n                if word1[idx1 - 1] == word2[idx2 - 1]:\n                    dp[idx1][idx2] = dp[idx1 - 1][idx2 - 1]\n                else:\n                    dp[idx1][idx2] = 1 + min(dp[idx1- 1][idx2], dp[idx1][idx2 - 1], dp[idx1 - 1][idx2 - 1])\n        \n        return dp[-1][-1]",
+            "timestamp": 1784024543
+        }
     ]
 }
