@@ -9642,5 +9642,23 @@
                 "timestamp": 1784024543
             }
         ]
+    },
+    "3995": {
+        "title": "GCD of Odd and Even Sums",
+        "title_slug": "gcd-of-odd-and-even-sums",
+        "difficulty": "Easy",
+        "tags": [
+            "Math",
+            "Number Theory"
+        ],
+        "submissions": [
+            {
+                "lang": "python3",
+                "runtime": "35 ms",
+                "memory": "19.8 MB",
+                "code": "class Solution:\n    def gcdOfOddEvenSums(self, n: int) -> int:\n        sumEven, sumOdd = 0, 0\n        odd, even = 1, 2\n        \n        while n:\n            sumOdd += odd\n            sumEven += even\n            \n            odd += 2\n            even += 2\n\n            n -= 1\n        \n        def gcd(x: int, y: int) -> int:\n            return x if y == 0 else gcd(y, x % y)\n        \n        return gcd(sumOdd, sumEven)",
+                "timestamp": 1784112560
+            }
+        ]
     }
 }

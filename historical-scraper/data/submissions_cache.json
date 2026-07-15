@@ -6718,5 +6718,16 @@
             "code": "class Solution:\n    def minDistance(self, word1: str, word2: str) -> int:\n        if not word1 and not word2:\n            return 0\n\n        len1 = len(word1)\n        len2 = len(word2)\n        dp = [[0] * (len2 + 1) for _ in range(len1 + 1)]\n\n        for idx1 in range(len1 + 1):\n            dp[idx1][0] = idx1\n        \n        for idx2 in range(len2 + 1):\n            dp[0][idx2] = idx2\n        \n        for idx1 in range(1, len1 + 1):\n            for idx2 in range(1, len2 + 1):\n                if word1[idx1 - 1] == word2[idx2 - 1]:\n                    dp[idx1][idx2] = dp[idx1 - 1][idx2 - 1]\n                else:\n                    dp[idx1][idx2] = 1 + min(dp[idx1- 1][idx2], dp[idx1][idx2 - 1], dp[idx1 - 1][idx2 - 1])\n        \n        return dp[-1][-1]",
             "timestamp": 1784024543
         }
+    ],
+    "3995": [
+        {
+            "title": "GCD of Odd and Even Sums",
+            "title_slug": "gcd-of-odd-and-even-sums",
+            "lang": "python3",
+            "runtime": "35 ms",
+            "memory": "19.8 MB",
+            "code": "class Solution:\n    def gcdOfOddEvenSums(self, n: int) -> int:\n        sumEven, sumOdd = 0, 0\n        odd, even = 1, 2\n        \n        while n:\n            sumOdd += odd\n            sumEven += even\n            \n            odd += 2\n            even += 2\n\n            n -= 1\n        \n        def gcd(x: int, y: int) -> int:\n            return x if y == 0 else gcd(y, x % y)\n        \n        return gcd(sumOdd, sumEven)",
+            "timestamp": 1784112560
+        }
     ]
 }
