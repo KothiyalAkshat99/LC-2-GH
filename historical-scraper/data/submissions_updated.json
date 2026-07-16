@@ -9660,5 +9660,27 @@
                 "timestamp": 1784112560
             }
         ]
+    },
+    "4242": {
+        "title": "Sum of GCD of Formed Pairs",
+        "title_slug": "sum-of-gcd-of-formed-pairs",
+        "difficulty": "Medium",
+        "tags": [
+            "Array",
+            "Math",
+            "Two Pointers",
+            "Sorting",
+            "Simulation",
+            "Number Theory"
+        ],
+        "submissions": [
+            {
+                "lang": "python3",
+                "runtime": "208 ms",
+                "memory": "36.8 MB",
+                "code": "class Solution:\n    def gcdSum(self, nums: list[int]) -> int:\n        n = len(nums)\n        mx = []\n\n        prefix_max = -inf\n\n        # Get Max values\n        for num in nums:\n            prefix_max = max(num, prefix_max)\n            mx.append(prefix_max)\n        \n        prefixGcd = [gcd(x, y) for x, y in zip(nums, mx)]\n        prefixGcd.sort()\n\n        ret = 0\n        left, right = 0, n - 1\n        \n        while left < right:\n            ret += gcd(prefixGcd[left], prefixGcd[right])\n            left += 1\n            right -= 1\n        \n        return ret",
+                "timestamp": 1784230205
+            }
+        ]
     }
 }
