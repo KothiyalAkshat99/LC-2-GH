@@ -6740,5 +6740,16 @@
             "code": "class Solution:\n    def gcdSum(self, nums: list[int]) -> int:\n        n = len(nums)\n        mx = []\n\n        prefix_max = -inf\n\n        # Get Max values\n        for num in nums:\n            prefix_max = max(num, prefix_max)\n            mx.append(prefix_max)\n        \n        prefixGcd = [gcd(x, y) for x, y in zip(nums, mx)]\n        prefixGcd.sort()\n\n        ret = 0\n        left, right = 0, n - 1\n        \n        while left < right:\n            ret += gcd(prefixGcd[left], prefixGcd[right])\n            left += 1\n            right -= 1\n        \n        return ret",
             "timestamp": 1784230205
         }
+    ],
+    "3583": [
+        {
+            "title": "Sorted GCD Pair Queries",
+            "title_slug": "sorted-gcd-pair-queries",
+            "lang": "python3",
+            "runtime": "499 ms",
+            "memory": "40.1 MB",
+            "code": "class Solution:\n    def gcdValues(self, nums: List[int], queries: List[int]) -> List[int]:\n        m = max(nums)\n\n        count = [0] * (m + 1)\n\n        for num in nums:\n            count[num] += 1\n        \n        for i in range(1, m + 1):\n            for j in range(i * 2, m + 1, i):\n                count[i] += count[j]\n        \n        for i in range(1, m + 1):\n            count[i] = count[i] * (count[i] - 1) // 2\n        \n        for i in range(m, 0, -1):\n            for j in range(i * 2, m + 1, i):\n                count[i] -= count[j]\n        \n        for i in range(1, m + 1):\n            count[i] += count[i - 1]\n\n        ret = []\n        for q in queries:\n            q += 1\n            pos = bisect_left(count, q)\n            ret.append(pos)\n        \n        return ret",
+            "timestamp": 1784324954
+        }
     ]
 }
